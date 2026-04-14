@@ -1,0 +1,66 @@
+# ChemHeaven — Apache configuration
+# ─────────────────────────────────────────────────────────────────────────────
+# Security & privacy hardening at the web server level.
+
+# ── Prevent directory listing ────────────────────────────────────────────────
+Options -Indexes
+
+# ── Deny access to sensitive directories from the web ────────────────────────
+<IfModule mod_rewrite.c>
+    RewriteEngine On
+
+    # Block direct HTTP access to config/, includes/, and database/ directories.
+    RewriteRule ^(config|includes|database)(/|$) - [F,L]
+</IfModule>
+
+# ── Redirect all traffic to public/ ─────────────────────────────────────────
+# When the document root is the repo root (not public/), rewrite to public/.
+<IfModule mod_rewrite.c>
+    RewriteEngine On
+    RewriteCond %{REQUEST_URI} !^/public/
+    RewriteRule ^(.*)$ /public/$1 [L]
+</IfModule>
+
+# ── Force HTTPS ───────────────────────────────────────────────────────────────
+<IfModule mod_rewrite.c>
+    RewriteCond %{HTTPS} off
+    RewriteCond %{HTTP_HOST} !^localhost [NC]
+    RewriteCond %{HTTP_HOST} !^127\.0\.0\.1 [NC]
+    RewriteRule ^(.*)$ https://%{HTTP_HOST}%{REQUEST_URI} [R=301,L]
+</IfModule>
+
+# ── HTTP security headers ─────────────────────────────────────────────────────
+<IfModule mod_headers.c>
+    Header always set X-Content-Type-Options "nosniff"
+    Header always set X-Frame-Options "DENY"
+    Header always set Referrer-Policy "strict-origin-when-cross-origin"
+    Header always set Permissions-Policy "geolocation=(), camera=(), microphone=()"
+    # Remove Apache version info
+    Header always unset X-Powered-By
+    Header always unset Server
+</IfModule>
+
+# ── Block access to dot-files (.git, .env, etc.) ─────────────────────────────
+<FilesMatch "^\.">
+    Require all denied
+</FilesMatch>
+
+# ── Block access to PHP config/include files directly ────────────────────────
+<FilesMatch "\.(sql|log|md|json|lock)$">
+    Require all denied
+</FilesMatch>
+
+# ── Disable ETags (minor privacy leak) ───────────────────────────────────────
+FileETag None
+Header unset ETag
+
+# ── Cache static assets ───────────────────────────────────────────────────────
+<FilesMatch "\.(css|png|jpg|jpeg|svg|ico|woff2?)$">
+    Header set Cache-Control "public, max-age=604800, immutable"
+</FilesMatch>
+
+# ── No caching for PHP pages ──────────────────────────────────────────────────
+<FilesMatch "\.php$">
+    Header set Cache-Control "no-store, no-cache, must-revalidate"
+    Header set Pragma "no-cache"
+</FilesMatch>
