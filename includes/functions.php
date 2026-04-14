@@ -172,7 +172,7 @@ function cart_update(int $variantId, int $qty): void
     }
     $key = (string) $variantId;
     if (isset($_SESSION['cart'][$key])) {
-        $_SESSION['cart'][$key]['quantity'] = max(1, min($qty, 999));
+        $_SESSION['cart'][$key]['quantity'] = min($qty, 999);
     }
 }
 
