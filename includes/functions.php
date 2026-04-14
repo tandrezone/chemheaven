@@ -308,12 +308,13 @@ function send_security_headers(): void
     }
 
     // No external scripts/styles/fonts — privacy-preserving CSP.
+    // 'unsafe-inline' for scripts is required for minimal inline JS (price updater etc.)
     header("Content-Security-Policy: default-src 'self'; "
          . "img-src 'self' https://i.ibb.co data:; "
          . "style-src 'self' 'unsafe-inline'; "
-         . "script-src 'none'; "
+         . "script-src 'self' 'unsafe-inline'; "
          . "frame-ancestors 'none'; "
-         . "form-action 'self' https://api.oxopay.com;");
+         . "form-action 'self' https://api.oxopay.com https://sandbox.oxopay.com;");
 
     header('X-Content-Type-Options: nosniff');
     header('X-Frame-Options: DENY');

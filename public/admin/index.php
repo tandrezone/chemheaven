@@ -31,12 +31,26 @@ $recentOrders = $db->query(
 $adminPageTitle = 'Dashboard';
 $adminActiveNav = 'dashboard';
 
+// Detect if admin is still using the well-known default password 'changeme'.
+$usingDefaultPassword = password_verify('changeme',
+    (string)$db->query("SELECT password_hash FROM admin_users ORDER BY id ASC LIMIT 1")->fetchColumn()
+);
+
 require __DIR__ . '/../../includes/admin-header.php';
 ?>
 
 <div class="admin-page-header">
     <h1>Dashboard</h1>
 </div>
+
+<?php if ($usingDefaultPassword): ?>
+    <div class="admin-alert admin-alert--error" role="alert">
+        ⚠️ <strong>Security warning:</strong> You are using the default admin password (<code>changeme</code>).
+        <a href="/admin/users.php?edit=<?= (int)$db->query('SELECT id FROM admin_users ORDER BY id ASC LIMIT 1')->fetchColumn() ?>">
+            Please change your password immediately.
+        </a>
+    </div>
+<?php endif; ?>
 
 <!-- Stats -->
 <div class="admin-stats-grid">

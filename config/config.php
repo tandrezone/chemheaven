@@ -27,9 +27,12 @@ define('APP_URL',     rtrim(getenv('APP_URL') ?: 'http://localhost', '/'));
 define('APP_VERSION', '1.0.0');
 
 // ── Session ───────────────────────────────────────────────────────────────────
-// These are applied before session_start() in header.php.
 define('SESSION_LIFETIME',    3600);   // seconds
-define('SESSION_COOKIE_NAME', '__Host-chemheaven_sess');
+// __Host- prefix requires Secure + Path=/ + no Domain; only valid over HTTPS.
+// Fall back to a plain name in non-HTTPS (local dev) environments.
+define('SESSION_COOKIE_NAME',
+    (isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off') ? '__Host-chemheaven_sess' : 'chemheaven_sess'
+);
 
 // ── Privacy / Security ────────────────────────────────────────────────────────
 // CSRF token length in bytes (hex-encoded → double length in string)
