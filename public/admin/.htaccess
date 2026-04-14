@@ -1,0 +1,16 @@
+# ChemHeaven — Admin area security
+Options -Indexes
+
+# Block direct access to everything except login, logout, and the index.
+# All other admin pages enforce auth via PHP — this is defence-in-depth.
+
+# No caching of admin pages
+<FilesMatch "\.php$">
+    Header set Cache-Control "no-store, no-cache, must-revalidate, private"
+    Header set Pragma "no-cache"
+</FilesMatch>
+
+# Prevent clickjacking on admin pages
+<IfModule mod_headers.c>
+    Header always set X-Frame-Options "DENY"
+</IfModule>

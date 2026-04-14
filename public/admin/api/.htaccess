@@ -1,0 +1,6 @@
+# API endpoints — JSON only, no directory listing
+Options -Indexes
+
+<FilesMatch "\.php$">
+    Header set Cache-Control "no-store, private"
+</FilesMatch>

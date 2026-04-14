@@ -35,6 +35,14 @@ define('SESSION_COOKIE_NAME', '__Host-chemheaven_sess');
 // CSRF token length in bytes (hex-encoded → double length in string)
 define('CSRF_TOKEN_BYTES', 32);
 
+// ── Admin ─────────────────────────────────────────────────────────────────────
+// Max failed login attempts before a temporary lockout.
+define('ADMIN_MAX_ATTEMPTS',  5);
+// Lockout duration in seconds (15 minutes).
+define('ADMIN_LOCKOUT_SECS',  900);
+// Admin session namespace key.
+define('ADMIN_SESSION_KEY',   '_ch_admin');
+
 // Load local overrides (not committed to git)
 $localConfig = __DIR__ . '/config.local.php';
 if (file_exists($localConfig)) {
