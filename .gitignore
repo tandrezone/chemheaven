@@ -1,0 +1,28 @@
+# Dependencies
+vendor/
+node_modules/
+
+# Local config (contains secrets — NEVER commit)
+config/config.local.php
+.env
+.env.*
+!.env.example
+
+# Logs
+*.log
+logs/
+
+# IDE / OS files
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# Build artifacts
+dist/
+build/
+
+# PHP cache
+*.cache

@@ -1,0 +1,17 @@
+# ChemHeaven — .htaccess for public directory
+# Serves PHP files; protects assets.
+
+Options -Indexes
+
+# ── PHP security settings ─────────────────────────────────────────────────────
+<IfModule mod_php.c>
+    php_flag display_errors    Off
+    php_flag log_errors        On
+    php_value error_reporting  E_ALL
+    php_flag expose_php        Off
+</IfModule>
+
+# ── Block access to dot-files ─────────────────────────────────────────────────
+<FilesMatch "^\.">
+    Require all denied
+</FilesMatch>
