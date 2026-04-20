@@ -108,7 +108,8 @@ function h(mixed $value): string
 /** Return the current cart array. */
 function cart_get(): array
 {
-    return $_SESSION['cart'] ?? [];
+    $cart = $_SESSION['cart'] ?? [];
+    return is_array($cart) ? $cart : [];
 }
 
 /** Add an item to the cart or increase its quantity. Returns false if invalid. */
@@ -186,7 +187,13 @@ function cart_count(): int
 {
     $count = 0;
     foreach (cart_get() as $item) {
-        $count += $item['quantity'];
+        if (!is_array($item)) {
+            continue;
+        }
+        $qty = (int) ($item['quantity'] ?? 0);
+        if ($qty > 0) {
+            $count += $qty;
+        }
     }
     return $count;
 }
@@ -196,7 +203,15 @@ function cart_total(): float
 {
     $total = 0.0;
     foreach (cart_get() as $item) {
-        $total += $item['price'] * $item['quantity'];
+        if (!is_array($item)) {
+            continue;
+        }
+        $price = (float) ($item['price'] ?? 0);
+        $qty   = (int) ($item['quantity'] ?? 0);
+        if ($price < 0 || $qty <= 0) {
+            continue;
+        }
+        $total += $price * $qty;
     }
     return $total;
 }
