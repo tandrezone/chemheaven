@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="en">
+@include(partials/head.html)
+
+<body>
+    @include(partials/site-header.html)
+    <main class="page-main">
+        <div class="site-shell">
+            <section class="admin-panel">
+                <span class="eyebrow">Control room</span>
+                <h1 class="admin-title">{{ $heading }}</h1>
+                <p class="admin-copy">{{ $message }}</p>
+                <div class="admin-grid">
+                    <div class="admin-card">
+                        <strong>{{ $card_one_value }}</strong>
+                        <span>{{ $card_one_label }}</span>
+                    </div>
+                    <div class="admin-card">
+                        <strong>{{ $card_two_value }}</strong>
+                        <span>{{ $card_two_label }}</span>
+                    </div>
+                    <div class="admin-card">
+                        <strong>{{ $card_three_value }}</strong>
+                        <span>{{ $card_three_label }}</span>
+                    </div>
+                </div>
+            </section>
+        </div>
+    </main>
+    @include(partials/site-footer.html)
+</body>
+
+</html>

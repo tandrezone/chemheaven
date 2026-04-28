@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="en">
+@include(partials/head.html)
+
+<body>
+    @include(partials/site-header.html)
+    <main class="page-main">
+        <div class="site-shell">
+            <section class="hero-panel">
+                <div class="hero-copy">
+                    <span class="eyebrow">Curated storefront</span>
+                    <h1 class="hero-title">{{ $heading }}</h1>
+                    <p class="hero-text">{{ $message }}</p>
+                    <div class="hero-stats">
+                        <div class="stat-card">
+                            <span class="stat-value">{{ $featured_count }}</span>
+                            <span class="stat-label">Featured releases</span>
+                        </div>
+                        <div class="stat-card">
+                            <span class="stat-value">{{ $variant_count }}</span>
+                            <span class="stat-label">Variant combinations</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="hero-art" aria-hidden="true"></div>
+            </section>
+
+            <section class="store-section" aria-labelledby="store-title">
+                <div class="section-head">
+                    <div>
+                        <h2 id="store-title" class="section-title">Fresh picks for the catalog</h2>
+                        <p class="section-copy">Browse the current selection with product imagery, compact descriptions,
+                            variants, and transparent pricing.</p>
+                    </div>
+                    <span class="catalog-badge">{{ $catalog_badge }}</span>
+                </div>
+
+                <div class="product-grid">
+                    @foreach($products)
+                    <article class="product-card">
+                        <div class="product-media">
+                            <img src="{{ $item.image }}" alt="{{ $item.name }}">
+                        </div>
+                        <div class="product-body">
+                            <p class="product-kicker">{{ $item.category }}</p>
+                            <h3 class="product-title">{{ $item.name }}</h3>
+                            <p class="product-description">{{ $item.description }}</p>
+                            <div class="product-meta">
+                                <p class="product-variants">{{ $item.variants }}</p>
+                                <span class="product-price">{{ $item.price }}</span>
+                            </div>
+                            <a href="/" class="product-action">View product</a>
+                        </div>
+                    </article>
+                    @endforeach
+                </div>
+            </section>
+        </div>
+    </main>
+    @include(partials/site-footer.html)
+</body>
+
+</html>

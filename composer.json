@@ -1,0 +1,17 @@
+{
+    "name": "tandre/chemheaven",
+    "description": "shop",
+    "type": "project",
+    "require": {
+        "vlucas/phpdotenv": "^5.6",
+        "tandrezone/zroute": "^1.0",
+        "tandrezone/ztemp": "^1.0"
+    },
+    "license": "MIT",
+    "autoload": {
+        "psr-4": {
+            "Tandre\\Chemheaven\\": "src/"
+        }
+    },
+    "minimum-stability": "stable"
+}
