@@ -36,23 +36,30 @@
                 </div>
 
                 <div class="product-grid">
-                    @foreach($products)
+                    @foreach($products as $product)
                     <article class="product-card">
                         <div class="product-media">
-                            <img src="{{ $item.image }}" alt="{{ $item.name }}">
+                            <img src="{{ $product.imagegen }}" alt="{{ $product.name }}">
                         </div>
                         <div class="product-body">
-                            <p class="product-kicker">{{ $item.category }}</p>
-                            <h3 class="product-title">{{ $item.name }}</h3>
-                            <p class="product-description">{{ $item.description }}</p>
+                            <p class="product-kicker">{{ $product.category }}</p>
+                            <h3 class="product-title">{{ $product.name }}</h3>
+                            <p class="product-description">{{ $product.description }}</p>
                             <div class="product-meta">
-                                <p class="product-variants">{{ $item.variants }}</p>
-                                <span class="product-price">{{ $item.price }}</span>
-                            </div>
-                            <a href="/" class="product-action">View product</a>
-                        </div>
-                    </article>
+                                <div class="variant-buttons" id="variantGroup">
+                                    @foreach($product.variants as $variant)
+                                        <button class="variant-button" data-price="{{ $variant.price }}" data-label="{{ $variant.label }}" data-id="{{ $variant.id }}">
+                                            {{ $variant.label }}
+                                        </button>
+                                    @endforeach
+                                </div>
+                
+                                        </div>
+                                        <a href="/" class="product-action">View product </a>
+                                    </div>
+                                </article>
                     @endforeach
+                                
                 </div>
             </section>
         </div>

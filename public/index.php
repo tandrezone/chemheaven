@@ -1,26 +1,22 @@
 <?php
-
 declare(strict_types=1);
+error_reporting(E_ALL);
 
 require_once __DIR__ . '/../vendor/autoload.php';
 require_once __DIR__ . '/../src/index.php';
-require_once __DIR__ . '/../src/admin.php';
+
 
 use zRoute\Router;
 
 $router = new Router();
-$admin = new Admin();
+
 
 $router->get('/', static function (array $params): void {
     main($params);
 });
 
-$router->get('/admin', static function (array $params) use ($admin): void {
-    $admin->dashboard();
-});
-
-$router->post('/admin', static function (array $params) use ($admin): void {
-    $admin->dashboard();
+$router->post('/order', static function (array $params): void {
+    order($params);
 });
 
 $router->notFound(static function (string $path): void {

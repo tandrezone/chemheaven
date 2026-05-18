@@ -3,6 +3,8 @@
 declare(strict_types=1);
 
 use Tandrezone\Ztemp\TemplateEngine;
+use Tandrezone\Services\ImageManipulator;
+use Tandrezone\OrderOrchestrator\OrderOrchestrator;
 
 function main(array $params = []): void
 {
@@ -10,41 +12,14 @@ function main(array $params = []): void
     header('Content-Type: text/html; charset=UTF-8');
 
     $engine = new TemplateEngine(__DIR__ . '/../templates');
-    $products = [
-        [
-            'image' => '/assets/store/amber-drops.svg',
-            'category' => 'Signature oils',
-            'name' => 'Amber Drops',
-            'description' => 'Citrus-led house blend with a smooth finish and an easy everyday profile.',
-            'variants' => 'Variants: 10 ml, 30 ml, 50 ml',
-            'price' => 'From EUR 18.90',
-        ],
-        [
-            'image' => '/assets/store/citrus-lab.svg',
-            'category' => 'Lab edition',
-            'name' => 'Citrus Lab',
-            'description' => 'Bright, clean notes built for customers who want a sharp and fresh opening.',
-            'variants' => 'Variants: 1 pack, 3 pack, 6 pack',
-            'price' => 'From EUR 12.50',
-        ],
-        [
-            'image' => '/assets/store/nocturne-mix.svg',
-            'category' => 'Evening release',
-            'name' => 'Nocturne Mix',
-            'description' => 'A deeper profile with layered botanicals and a fuller body for premium shelves.',
-            'variants' => 'Variants: 15 g, 30 g, 60 g',
-            'price' => 'From EUR 24.00',
-        ],
-        [
-            'image' => '/assets/store/verdant-wave.svg',
-            'category' => 'Botanical line',
-            'name' => 'Verdant Wave',
-            'description' => 'Green, bright, and balanced, packaged as a clean modern staple for the store.',
-            'variants' => 'Variants: Starter, Core, Collector',
-            'price' => 'From EUR 16.40',
-        ],
-    ];
-
+    $products = json_decode(file_get_contents(__DIR__ . '/../api/products.json'), true)['products'] ?? [];
+    foreach ($products as &$product) {
+       $product['imagegen'] = ImageManipulator::createTextImageBase64($product['name'], __DIR__ . '/../assets/card_bg.png', __DIR__ . '/../assets/Roboto-Regular.ttf');
+    }
+ //   echo "<pre>";
+//print_r($products);
+//echo "</pre>";
+//exit();
     echo $engine->render('home.html', [
         'title' => 'ChemHeaven Store',
         'brand' => 'ChemHeaven',
@@ -57,4 +32,18 @@ function main(array $params = []): void
         'footer_text' => 'ChemHeaven store mockup powered by zRoute and ztemp.',
         'products' => $products,
     ]);
+}
+
+function order(array $params = []): void
+{
+    if(empty($params['products'])) {
+        echo "No products selected.";
+        return;
+    }
+
+    $orderOrchestrator = new OrderOrchestrator();
+
+    echo $orderOrchestrator->renderOrderForm($params['products'], 'standard');
+
+    $total = $orderOrchestrator->calculateTotal($params['products'], 'express');
 }

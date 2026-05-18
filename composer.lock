@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "b0ef2129edc43a86474f4c9f55c11b91",
+    "content-hash": "a2069fb7c1d561ff5ed386755543ce01",
     "packages": [
         {
             "name": "graham-campbell/result-type",
@@ -396,6 +396,44 @@
             "time": "2026-04-10T16:19:22+00:00"
         },
         {
+            "name": "tandrezone/order-orchestrator",
+            "version": "v1.0.0",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/tandrezone/OrderOrquestrator.git",
+                "reference": "8344a41fb357e2874ff0423ff5f9d229a86b6344"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/tandrezone/OrderOrquestrator/zipball/8344a41fb357e2874ff0423ff5f9d229a86b6344",
+                "reference": "8344a41fb357e2874ff0423ff5f9d229a86b6344",
+                "shasum": ""
+            },
+            "require": {
+                "php": "^8.1",
+                "tandrezone/ztemp": "^1.0"
+            },
+            "bin": [
+                "bin/install-order-template"
+            ],
+            "type": "library",
+            "autoload": {
+                "psr-4": {
+                    "Tandrezone\\OrderOrchestrator\\": "src/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "description": "Order creation package with shipping form template and total calculation.",
+            "support": {
+                "issues": "https://github.com/tandrezone/OrderOrquestrator/issues",
+                "source": "https://github.com/tandrezone/OrderOrquestrator/tree/v1.0.0"
+            },
+            "time": "2026-05-14T15:12:39+00:00"
+        },
+        {
             "name": "tandrezone/zroute",
             "version": "v1.0.0",
             "source": {
@@ -442,16 +480,16 @@
         },
         {
             "name": "tandrezone/ztemp",
-            "version": "v1.0.0",
+            "version": "v1.0.3",
             "source": {
                 "type": "git",
-                "url": "https://github.com/tandrezone/ztemp",
-                "reference": "306689c3f56ea698cd3f268145ad26c2fe83eb34"
+                "url": "https://github.com/tandrezone/ztemp.git",
+                "reference": "18196627f8ff42626e43706bb0a0348eb6684d1b"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/tandrezone/ztemp/zipball/306689c3f56ea698cd3f268145ad26c2fe83eb34",
-                "reference": "306689c3f56ea698cd3f268145ad26c2fe83eb34",
+                "url": "https://api.github.com/repos/tandrezone/ztemp/zipball/18196627f8ff42626e43706bb0a0348eb6684d1b",
+                "reference": "18196627f8ff42626e43706bb0a0348eb6684d1b",
                 "shasum": ""
             },
             "require": {
@@ -481,7 +519,11 @@
                 "template",
                 "templating"
             ],
-            "time": "2026-04-28T12:40:25+00:00"
+            "support": {
+                "issues": "https://github.com/tandrezone/ztemp/issues",
+                "source": "https://github.com/tandrezone/ztemp/tree/v1.0.3"
+            },
+            "time": "2026-05-15T11:02:38+00:00"
         },
         {
             "name": "vlucas/phpdotenv",
@@ -571,10 +613,10 @@
     "packages-dev": [],
     "aliases": [],
     "minimum-stability": "stable",
-    "stability-flags": [],
+    "stability-flags": {},
     "prefer-stable": false,
     "prefer-lowest": false,
-    "platform": [],
-    "platform-dev": [],
-    "plugin-api-version": "2.3.0"
+    "platform": {},
+    "platform-dev": {},
+    "plugin-api-version": "2.9.0"
 }
