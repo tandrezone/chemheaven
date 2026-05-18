@@ -4,6 +4,7 @@
 
 <body>
     @include(partials/site-header.html)
+    @include(partials/cart-sidebar.html)    
     <main class="page-main">
         <div class="site-shell">
             <section class="hero-panel">
@@ -48,14 +49,15 @@
                             <div class="product-meta">
                                 <div class="variant-buttons" id="variantGroup">
                                     @foreach($product.variants as $variant)
-                                        <button class="variant-button" data-price="{{ $variant.price }}" data-label="{{ $variant.label }}" data-id="{{ $variant.id }}">
-                                            {{ $variant.label }}
+                                        <button class="variant-button co-add-btn" data-product-name="{{ $product.name }}" data-product-variant="{{ $variant.label }}" data-price="{{ $variant.price }}" data-quantity="1" data-id="{{ $variant.id }}" data-product-id="{{ $product.id }}" type="button">
+                                           {{ $variant.label }}
                                         </button>
+
                                     @endforeach
                                 </div>
                 
                                         </div>
-                                        <a href="/" class="product-action">View product </a>
+                                        <a href="/product/{{ $product.slug }}" class="product-action">View product</a>
                                     </div>
                                 </article>
                     @endforeach
@@ -64,6 +66,7 @@
             </section>
         </div>
     </main>
+    @include(partials/cart-sidebar.html)
     @include(partials/site-footer.html)
 </body>
 

@@ -1,0 +1,238 @@
+<?php
+
+declare(strict_types=1);
+
+namespace Tandrezone\Chemheaven\Controllers;
+
+use Tandrezone\Ztemp\TemplateEngine;
+use Tandrezone\Chemheaven\Services\ImageManipulator;
+use Tandrezone\OrderOrchestrator\OrderOrchestrator;
+use CartOfficer\Cart;
+use CartOfficer\CartController;
+use Tandrezone\Chemheaven\Payment\PaymentManager;
+
+class ShopController
+{
+    public static function main(array $params = []): void
+    {
+        http_response_code(200);
+        header('Content-Type: text/html; charset=UTF-8');
+
+        $engine = new TemplateEngine(__DIR__ . '/../../templates');
+        $products = json_decode(file_get_contents(__DIR__ . '/../../api/products.json'), true)['products'] ?? [];
+        foreach ($products as &$product) {
+            $product['imagegen'] = ImageManipulator::createTextImageBase64(
+                $product['name'], 
+                __DIR__ . '/../../assets/card_bg.png', 
+                __DIR__ . '/../../assets/Roboto-Regular.ttf'
+            );
+        }
+
+        echo $engine->render('home.html', [
+            'title' => 'ChemHeaven Store',
+            'brand' => 'ChemHeaven',
+            'tagline' => 'Curated compounds for a storefront.',
+            'heading' => 'A storefront built around clear product cards.',
+            'message' => 'Each product now lands in a styled card with artwork, concise descriptions, visible variants, and pricing that is easy to scan.',
+            'featured_count' => '04',
+            'variant_count' => '12',
+            'catalog_badge' => '4 products in the launch edit',
+            'footer_text' => 'ChemHeaven store mockup powered by zRoute and ztemp.',
+            'products' => $products,
+        ]);
+    }
+
+    public static function product(array $params = []): void
+    {
+        $slug = $params['slug'] ?? '';
+        $products = json_decode(file_get_contents(__DIR__ . '/../../api/products.json'), true)['products'] ?? [];
+        
+        $foundProduct = null;
+        foreach ($products as $p) {
+            if (($p['slug'] ?? '') === $slug) {
+                $foundProduct = $p;
+                break;
+            }
+        }
+        
+        if (!$foundProduct) {
+            http_response_code(404);
+            echo "Product not found.";
+            return;
+        }
+        
+        // Generate image artwork
+        $foundProduct['imagegen'] = ImageManipulator::createTextImageBase64(
+            $foundProduct['name'], 
+            __DIR__ . '/../../assets/card_bg.png', 
+            __DIR__ . '/../../assets/Roboto-Regular.ttf'
+        );
+        
+        http_response_code(200);
+        header('Content-Type: text/html; charset=UTF-8');
+        
+        $engine = new TemplateEngine(__DIR__ . '/../../templates');
+        echo $engine->render('product.html', [
+            'title' => $foundProduct['name'] . ' - ChemHeaven Store',
+            'product' => $foundProduct,
+            'product_name' => $foundProduct['name'] ?? '',
+            'product_description' => $foundProduct['description'] ?? '',
+            'product_category_name' => $foundProduct['category']['name'] ?? (is_string($foundProduct['category'] ?? null) ? $foundProduct['category'] : ''),
+            'product_id' => $foundProduct['id'] ?? '',
+            'product_imagegen' => $foundProduct['imagegen'] ?? '',
+        ]);
+    }
+
+    public static function checkoutGet(array $params = []): void
+    {
+        $cart = new Cart();
+        if ($cart->isEmpty()) {
+            header('Location: /');
+            exit;
+        }
+        
+        $items = [];
+        foreach ($cart->items() as $key => $item) {
+            $items[] = array_merge($item->toArray(), [
+                'key' => $key,
+                'line_total' => number_format($item->lineTotal(), 2),
+                'price_formatted' => number_format($item->price, 2)
+            ]);
+        }
+        
+        $subtotal = $cart->total();
+        $shipping_cost = 10.00;
+        
+        http_response_code(200);
+        header('Content-Type: text/html; charset=UTF-8');
+        
+        $engine = new TemplateEngine(__DIR__ . '/../../templates');
+        echo $engine->render('checkout.html', [
+            'title' => 'Checkout - ChemHeaven Store',
+            'items' => $items,
+            'subtotal' => $subtotal,
+            'subtotal_formatted' => number_format($subtotal, 2),
+            'shipping_formatted' => number_format($shipping_cost, 2),
+            'total_formatted' => number_format($subtotal + $shipping_cost, 2),
+            'cart_payload_raw' => json_encode([
+                'items' => $cart->toArray(),
+                'total' => $subtotal,
+                'item_count' => $cart->count()
+            ])
+        ]);
+    }
+
+    public static function checkoutPost(array $params = []): void
+    {
+        $cart = new Cart();
+        if ($cart->isEmpty()) {
+            header('Location: /');
+            exit;
+        }
+        
+        $shippingMethod = $_POST['shipping_method'] ?? 'standard';
+        $shippingCost = match ($shippingMethod) {
+            'express' => 25.50,
+            'pickup' => 0.00,
+            default => 10.00
+        };
+        
+        $subtotal = $cart->total();
+        $total = $subtotal + $shippingCost;
+        
+        $paymentManager = new PaymentManager();
+        $driver = $paymentManager->getDriver('oxo');
+        
+        $orderData = [
+            'total' => $total,
+            'email' => $_POST['email'] ?? '',
+            'name' => ($_POST['first_name'] ?? '') . ' ' . ($_POST['last_name'] ?? '')
+        ];
+        
+        $invoice = $driver->createInvoice($orderData);
+        
+        // Store invoice in session for payment page access
+        if (session_status() === PHP_SESSION_NONE) {
+            session_start();
+        }
+        $_SESSION['active_invoice_' . $invoice['invoice_id']] = $invoice;
+        
+        // Clear Cart since we have created an order / invoice successfully
+        $cart->clear();
+        
+        // Redirect to the payment redirect URL
+        header('Location: ' . $invoice['redirect_url']);
+        exit;
+    }
+
+    public static function paymentGet(array $params = []): void
+    {
+        if (session_status() === PHP_SESSION_NONE) {
+            session_start();
+        }
+        
+        $invoiceId = $_GET['invoice_id'] ?? '';
+        $paymentManager = new PaymentManager();
+        $driver = $paymentManager->getDriver('oxo');
+        
+        if (($_GET['action'] ?? '') === 'status') {
+            $status = $driver->checkPaymentStatus($invoiceId);
+            header('Content-Type: application/json; charset=utf-8');
+            echo json_encode(['status' => $status]);
+            exit;
+        }
+        
+        if (($_GET['action'] ?? '') === 'pay') {
+            $_SESSION["payment_status_{$invoiceId}"] = 'paid';
+            header('Content-Type: application/json; charset=utf-8');
+            echo json_encode(['status' => 'paid']);
+            exit;
+        }
+        
+        $invoice = $_SESSION['active_invoice_' . $invoiceId] ?? null;
+        if (!$invoice) {
+            http_response_code(404);
+            echo "Invoice not found.";
+            return;
+        }
+        
+        http_response_code(200);
+        header('Content-Type: text/html; charset=UTF-8');
+        
+        $engine = new TemplateEngine(__DIR__ . '/../../templates');
+        echo $engine->render('payment.html', [
+            'title' => 'Crypto Payment - ChemHeaven Store',
+            'invoice_id' => $invoice['invoice_id'],
+            'amount_formatted' => number_format($invoice['amount'], 2),
+            'address' => $invoice['address'],
+            'currency' => $invoice['currency'],
+            'qr_data_encoded' => urlencode($invoice['qr_data'])
+        ]);
+    }
+
+    public static function order(array $params = []): void
+    {
+        if (empty($params['products'])) {
+            echo "No products selected.";
+            return;
+        }
+
+        $orderOrchestrator = new OrderOrchestrator();
+
+        echo $orderOrchestrator->renderOrderForm($params['products'], 'standard');
+
+        $total = $orderOrchestrator->calculateTotal($params['products'], 'express');
+    }
+
+    public static function addToCart(array $params = []): void
+    {
+        if (session_status() === PHP_SESSION_NONE) {
+            session_start();
+        }
+        
+        $cart       = new Cart();
+        $controller = new CartController($cart, '/checkout');
+
+        $controller->handle();
+    }
+}

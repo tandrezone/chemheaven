@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "a2069fb7c1d561ff5ed386755543ce01",
+    "content-hash": "b0ef2129edc43a86474f4c9f55c11b91",
     "packages": [
         {
             "name": "graham-campbell/result-type",
@@ -394,44 +394,6 @@
                 }
             ],
             "time": "2026-04-10T16:19:22+00:00"
-        },
-        {
-            "name": "tandrezone/order-orchestrator",
-            "version": "v1.0.0",
-            "source": {
-                "type": "git",
-                "url": "https://github.com/tandrezone/OrderOrquestrator.git",
-                "reference": "8344a41fb357e2874ff0423ff5f9d229a86b6344"
-            },
-            "dist": {
-                "type": "zip",
-                "url": "https://api.github.com/repos/tandrezone/OrderOrquestrator/zipball/8344a41fb357e2874ff0423ff5f9d229a86b6344",
-                "reference": "8344a41fb357e2874ff0423ff5f9d229a86b6344",
-                "shasum": ""
-            },
-            "require": {
-                "php": "^8.1",
-                "tandrezone/ztemp": "^1.0"
-            },
-            "bin": [
-                "bin/install-order-template"
-            ],
-            "type": "library",
-            "autoload": {
-                "psr-4": {
-                    "Tandrezone\\OrderOrchestrator\\": "src/"
-                }
-            },
-            "notification-url": "https://packagist.org/downloads/",
-            "license": [
-                "MIT"
-            ],
-            "description": "Order creation package with shipping form template and total calculation.",
-            "support": {
-                "issues": "https://github.com/tandrezone/OrderOrquestrator/issues",
-                "source": "https://github.com/tandrezone/OrderOrquestrator/tree/v1.0.0"
-            },
-            "time": "2026-05-14T15:12:39+00:00"
         },
         {
             "name": "tandrezone/zroute",

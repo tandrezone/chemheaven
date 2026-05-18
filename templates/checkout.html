@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="en">
+@include(partials/head.html)
+
+<body>
+    @include(partials/site-header.html)
+    
+    <main class="page-main">
+        <div class="site-shell">
+            <div class="checkout-panel">
+                <!-- Left Column: Checkout Billing & Shipping Form -->
+                <section class="checkout-billing-card" aria-labelledby="checkout-title">
+                    <h1 id="checkout-title" class="checkout-title">Customer Information</h1>
+                    
+                    <form id="checkout-form" action="/checkout" method="POST">
+                        <!-- Hidden input to carry cart payload -->
+                        <input type="hidden" name="cart_payload" value="{{ $cart_payload_raw }}">
+                        
+                        <div class="form-grid">
+                            <div class="form-group">
+                                <label for="first_name" class="form-label">First Name</label>
+                                <input type="text" id="first_name" name="first_name" class="form-input" required>
+                            </div>
+                            
+                            <div class="form-group">
+                                <label for="last_name" class="form-label">Last Name</label>
+                                <input type="text" id="last_name" name="last_name" class="form-input" required>
+                            </div>
+                            
+                            <div class="form-group full-width">
+                                <label for="email" class="form-label">Email Address</label>
+                                <input type="email" id="email" name="email" class="form-input" placeholder="you@example.com" required>
+                            </div>
+                            
+                            <div class="form-group full-width">
+                                <label for="address" class="form-label">Shipping Address</label>
+                                <input type="text" id="address" name="address" class="form-input" placeholder="123 Main St, Apt 4" required>
+                            </div>
+                            
+                            <div class="form-group">
+                                <label for="zip" class="form-label">Zip Code</label>
+                                <input type="text" id="zip" name="zip" class="form-input" required>
+                            </div>
+                            
+                            <div class="form-group">
+                                <label for="city" class="form-label">City</label>
+                                <input type="text" id="city" name="city" class="form-input" required>
+                            </div>
+                            
+                            <div class="form-group full-width">
+                                <label for="phone" class="form-label">Phone Number</label>
+                                <input type="tel" id="phone" name="phone" class="form-input" placeholder="+1 (555) 000-0000" required>
+                            </div>
+
+                            <div class="form-group full-width">
+                                <label for="shipping_method" class="form-label">Shipping Method</label>
+                                <select id="shipping_method" name="shipping_method" class="form-select">
+                                    <option value="standard" data-price="10.00" selected>Standard Shipping (3-5 business days) — $10.00</option>
+                                    <option value="express" data-price="25.50">Express Shipping (1-2 business days) — $25.50</option>
+                                    <option value="pickup" data-price="0.00">In-store Pickup (Free) — $0.00</option>
+                                </select>
+                            </div>
+                            
+                            <div class="form-group full-width">
+                                <label for="payment_gateway" class="form-label">Payment Option</label>
+                                <select id="payment_gateway" name="payment_gateway" class="form-select">
+                                    <option value="oxo" selected>Crypto Payment (Oxo Pay)</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <button type="submit" class="checkout-btn">Proceed to Payment</button>
+                    </form>
+                </section>
+
+                <!-- Right Column: Order Summary -->
+                <aside class="checkout-summary-card" aria-labelledby="summary-title">
+                    <h2 id="summary-title" class="checkout-title">Order Summary</h2>
+                    
+                    <div class="checkout-items-list">
+                        @foreach($items as $item)
+                        <div class="checkout-item">
+                            <div class="checkout-item-details">
+                                <span class="checkout-item-name">{{ $item.product_name }}</span>
+                                <span class="checkout-item-variant">Variant: {{ $item.product_variant }} (x{{ $item.quantity }})</span>
+                            </div>
+                            <span class="checkout-item-total">${{ $item.line_total }}</span>
+                        </div>
+                        @endforeach
+                    </div>
+
+                    <div class="checkout-totals">
+                        <div class="totals-row">
+                            <span>Subtotal</span>
+                            <span>${{ $subtotal_formatted }}</span>
+                        </div>
+                        <div class="totals-row">
+                            <span>Shipping</span>
+                            <span id="shipping-display">${{ $shipping_formatted }}</span>
+                        </div>
+                        <div class="totals-row grand-total">
+                            <span>Total Due</span>
+                            <span id="total-display">${{ $total_formatted }}</span>
+                        </div>
+                    </div>
+                </aside>
+            </div>
+        </div>
+    </main>
+
+    @include(partials/site-footer.html)
+
+    <script>
+        (function() {
+            const selectEl = document.getElementById('shipping_method');
+            const shippingDisplay = document.getElementById('shipping-display');
+            const totalDisplay = document.getElementById('total-display');
+            const subtotal = parseFloat("{{ $subtotal }}");
+
+            function updateTotals() {
+                const selectedOpt = selectEl.options[selectEl.selectedIndex];
+                const shippingPrice = parseFloat(selectedOpt.dataset.price);
+                const grandTotal = subtotal + shippingPrice;
+
+                shippingDisplay.textContent = new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' }).format(shippingPrice);
+                totalDisplay.textContent = new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' }).format(grandTotal);
+            }
+
+            selectEl.addEventListener('change', updateTotals);
+            updateTotals();
+        })();
+    </script>
+</body>
+</html>

@@ -1,5 +1,5 @@
 <?php
-namespace Tandrezone\Services;
+namespace Tandrezone\Chemheaven\Services;
 class ImageManipulator
 {
     public function __construct()
