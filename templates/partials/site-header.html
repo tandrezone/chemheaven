@@ -1,12 +1,8 @@
 <header class="site-header">
     <div class="site-shell header-inner">
-        <div class="brand-lockup">
-            <div class="brand-mark"></div>
-            <div class="brand-copy">
-                <p class="brand-name">{{ $brand }}</p>
-                <p class="brand-tagline">{{ $tagline }}</p>
-            </div>
-        </div>
+        <a href="/" class="brand-lockup">
+            <img src="/assets/logo.png" alt="ChemHeaven" class="brand-logo-img">
+        </a>
         <nav class="site-nav" aria-label="Primary navigation">
             @include('partials/cart-button.html')
         </nav>

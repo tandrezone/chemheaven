@@ -4,8 +4,7 @@
 
 <body>
     @include(partials/site-header.html)
-    @include(partials/cart-sidebar.html)    
-    
+
     <main class="page-main">
         <div class="site-shell">
             <!-- Back to catalog link -->
@@ -98,6 +97,7 @@
         </div>
     </main>
 
+    @include(partials/cart-sidebar.html)
     @include(partials/site-footer.html)
 
     <!-- Dynamic interactions script -->
@@ -153,6 +153,5 @@
             updateBtnAttributes();
         })();
     </script>
-    @include(partials/cart-sidebar.html)
 </body>
 </html>

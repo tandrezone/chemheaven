@@ -16,9 +16,31 @@ Options -Indexes
     php_flag log_errors        On
     php_value error_reporting  E_ALL
     php_flag expose_php        Off
+    php_value session.cookie_httponly 1
+    php_value session.cookie_samesite Strict
+    php_value session.use_strict_mode 1
+</IfModule>
+
+# ── Security headers ──────────────────────────────────────────────────────────
+<IfModule mod_headers.c>
+    Header set X-Content-Type-Options "nosniff"
+    Header set X-Frame-Options "DENY"
+    Header set Referrer-Policy "strict-origin-when-cross-origin"
+    Header set Permissions-Policy "camera=(), microphone=(), geolocation=()"
+    Header set X-XSS-Protection "1; mode=block"
 </IfModule>
 
 # ── Block access to dot-files ─────────────────────────────────────────────────
 <FilesMatch "^\.">
+    Require all denied
+</FilesMatch>
+
+# ── Block access to sensitive file types in public/ ──────────────────────────
+<FilesMatch "\.(sql|log|bak|env|yml|yaml|ini|conf|sh)$">
+    Require all denied
+</FilesMatch>
+
+# ── Prevent directory listing & access to composer files ──────────────────────
+<FilesMatch "(composer\.(json|lock)|package\.json|package-lock\.json)$">
     Require all denied
 </FilesMatch>

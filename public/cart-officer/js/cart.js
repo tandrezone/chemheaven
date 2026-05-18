@@ -40,11 +40,21 @@
     }).format(amount);
   }
 
+  /** Read the CSRF token from the meta tag. */
+  function csrfToken() {
+    var meta = document.querySelector('meta[name="csrf-token"]');
+    return meta ? meta.getAttribute('content') : '';
+  }
+
   function ajax(body) {
     return fetch(cfg.cartEndpoint, {
-      method:  'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body:    JSON.stringify(body),
+      method:      'POST',
+      credentials: 'same-origin',
+      headers: {
+        'Content-Type':  'application/json',
+        'X-CSRF-TOKEN':  csrfToken(),
+      },
+      body: JSON.stringify(body),
     }).then(function (r) {
       if (!r.ok) throw new Error('Network error ' + r.status);
       return r.json();
@@ -161,7 +171,7 @@
 
   /* ── Fetch / refresh cart ─────────────────────────────── */
   function fetchCart() {
-    fetch(cfg.cartEndpoint + '?action=get')
+    fetch(cfg.cartEndpoint + '?action=get', { credentials: 'same-origin' })
       .then(function (r) { return r.json(); })
       .then(renderCart)
       .catch(function (e) { toast('Could not load cart.', 'error'); });
@@ -254,13 +264,13 @@
         payloadInput.value = JSON.stringify(data.payload);
         form.appendChild(payloadInput);
 
-        // CSRF token support (reads from meta tag if present)
-        var csrfMeta = document.querySelector('meta[name="csrf-token"]');
-        if (csrfMeta) {
+        // CSRF token support
+        var token = csrfToken();
+        if (token) {
           var csrf = document.createElement('input');
           csrf.type  = 'hidden';
-          csrf.name  = '_token';
-          csrf.value = csrfMeta.getAttribute('content');
+          csrf.name  = '_csrf_token';
+          csrf.value = token;
           form.appendChild(csrf);
         }
 
@@ -300,8 +310,12 @@
       quantity:        quantity,
     })
       .then(function (data) {
-        renderCart(data);
-        toast('Added to cart: ' + productName);
+        if (data.error) {
+          toast(data.error, 'error');
+        } else {
+          renderCart(data);
+          toast('Added to cart: ' + productName);
+        }
       })
       .catch(function () { toast('Could not add to cart.', 'error'); })
       .finally(function () { btn.classList.remove('co-loading'); });
