@@ -38,18 +38,19 @@
 
                 <div class="product-grid">
                     @foreach($products as $product)
-                    <article class="product-card">
+                    <article class="product-card" data-product-url="/product/{{ $product.slug }}" tabindex="0" role="link"
+                        aria-label="Open {{ $product.name }} details">
                         <div class="product-media">
                             <img src="{{ $product.imagegen }}" alt="{{ $product.name }}">
                         </div>
                         <div class="product-body">
                             <p class="product-kicker">{{ $product.category }}</p>
                             <h3 class="product-title">{{ $product.name }}</h3>
-                            <p class="product-description">{{ $product.description }}</p>
+                            <p class="product-description">{{ $product.short_description }}</p>
                             <div class="product-meta">
                                 <div class="variant-buttons" id="variantGroup">
                                     @foreach($product.variants as $variant)
-                                    <button class="variant-button co-add-btn" data-product-name="{{ $product.name }}"
+                                    <button class="variant-button" data-product-name="{{ $product.name }}"
                                         data-product-variant="{{ $variant.label }}" data-price="{{ $variant.price }}"
                                         data-quantity="1" data-id="{{ $variant.id }}"
                                         data-product-id="{{ $product.id }}" type="button">
@@ -58,7 +59,14 @@
                                     @endforeach
                                 </div>
                             </div>
-                            <a href="/product/{{ $product.slug }}" class="product-action">View product</a>
+                            <div class="product-card-footer">
+                                <p class="product-price" data-price-display>$0.00</p>
+                                <button class="co-add-btn product-card-add-btn" data-product-name="{{ $product.name }}"
+                                    data-product-variant="" data-price="0" data-quantity="1" data-id=""
+                                    data-product-id="{{ $product.id }}" type="button">
+                                    Add
+                                </button>
+                            </div>
                         </div>
                     </article>
                     @endforeach
@@ -69,6 +77,85 @@
 
     @include(cart-officer/cart-sidebar.html)
     @include(partials/site-footer.html)
+
+    <script>
+        (function () {
+            const cardSelector = '.product-card';
+            const interactiveSelector = 'button, a, input, select, textarea, [role="button"]';
+            const currencyFormatter = new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' });
+
+            document.querySelectorAll(cardSelector).forEach((card) => {
+                const variantButtons = card.querySelectorAll('.variant-button');
+                const addButton = card.querySelector('.product-card-add-btn');
+                const priceDisplay = card.querySelector('[data-price-display]');
+
+                function selectVariant(button) {
+                    if (!button) {
+                        return;
+                    }
+
+                    variantButtons.forEach((btn) => {
+                        btn.classList.remove('active');
+                        btn.setAttribute('aria-pressed', 'false');
+                    });
+
+                    button.classList.add('active');
+                    button.setAttribute('aria-pressed', 'true');
+
+                    const price = parseFloat(button.dataset.price || '0');
+                    const variantLabel = button.dataset.productVariant || '';
+                    const variantId = button.dataset.id || '';
+
+                    if (priceDisplay) {
+                        priceDisplay.textContent = currencyFormatter.format(price);
+                    }
+
+                    if (addButton) {
+                        addButton.dataset.price = String(price);
+                        addButton.dataset.productVariant = variantLabel;
+                        addButton.dataset.id = variantId;
+                    }
+                }
+
+                if (variantButtons.length > 0) {
+                    selectVariant(variantButtons[0]);
+                }
+
+                variantButtons.forEach((button) => {
+                    button.setAttribute('aria-pressed', 'false');
+                    button.addEventListener('click', (event) => {
+                        event.preventDefault();
+                        event.stopPropagation();
+                        selectVariant(button);
+                    });
+                });
+
+                card.addEventListener('click', (event) => {
+                    if (event.target.closest(interactiveSelector)) {
+                        return;
+                    }
+                    const targetUrl = card.dataset.productUrl;
+                    if (targetUrl) {
+                        window.location.assign(targetUrl);
+                    }
+                });
+
+                card.addEventListener('keydown', (event) => {
+                    if (event.target !== card) {
+                        return;
+                    }
+                    if (event.key !== 'Enter' && event.key !== ' ') {
+                        return;
+                    }
+                    event.preventDefault();
+                    const targetUrl = card.dataset.productUrl;
+                    if (targetUrl) {
+                        window.location.assign(targetUrl);
+                    }
+                });
+            });
+        })();
+    </script>
 </body>
 
 </html>

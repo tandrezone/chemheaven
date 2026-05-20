@@ -10,9 +10,153 @@ use Tandrezone\OrderOrchestrator\OrderOrchestrator;
 use CartOfficer\Cart;
 use CartOfficer\CartController;
 use Tandrezone\Chemheaven\Payment\PaymentManager;
+use PDO;
+use PDOException;
 
 class ShopController
 {
+    private static ?PDO $pdo = null;
+
+    /**
+     * Build and cache a PDO connection for storefront catalog queries.
+     */
+    private static function db(): PDO
+    {
+        if (self::$pdo instanceof PDO) {
+            return self::$pdo;
+        }
+
+        $host = $_ENV['DB_HOST'] ?? '127.0.0.1';
+        $port = $_ENV['DB_PORT'] ?? '3306';
+        $dbName = $_ENV['DB_NAME'] ?? ($_ENV['DB_DATABASE'] ?? 'product_management');
+        $user = $_ENV['DB_USER'] ?? ($_ENV['DB_USERNAME'] ?? 'manager');
+        $pass = $_ENV['DB_PASS'] ?? ($_ENV['DB_PASSWORD'] ?? 'manager');
+        $charset = $_ENV['DB_CHARSET'] ?? 'utf8mb4';
+
+        $dsn = sprintf('mysql:host=%s;port=%s;dbname=%s;charset=%s', $host, $port, $dbName, $charset);
+
+        self::$pdo = new PDO($dsn, $user, $pass, [
+            PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
+            PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC,
+            PDO::ATTR_EMULATE_PREPARES => false,
+        ]);
+
+        return self::$pdo;
+    }
+
+    /**
+     * Load all active products with category and variant rows from database.
+     */
+    private static function loadProductsFromDatabase(): array
+    {
+        $pdo = self::db();
+
+        $productsStmt = $pdo->query(
+            'SELECT p.id, p.name, p.slug, p.description, c.name AS category_name
+             FROM products p
+             LEFT JOIN categories c ON c.id = p.category_id
+             WHERE p.status = "active"
+             ORDER BY p.created_at DESC, p.id DESC'
+        );
+
+        $products = [];
+        $productIds = [];
+
+        foreach ($productsStmt->fetchAll() as $row) {
+            $id = (string) $row['id'];
+            $products[$id] = [
+                'id' => $id,
+                'name' => (string) ($row['name'] ?? ''),
+                'slug' => (string) ($row['slug'] ?? ''),
+                'description' => (string) ($row['description'] ?? ''),
+                'category' => (string) ($row['category_name'] ?? ''),
+                'variants' => [],
+            ];
+            $productIds[] = (int) $row['id'];
+        }
+
+        if ($productIds === []) {
+            return [];
+        }
+
+        $placeholders = implode(',', array_fill(0, count($productIds), '?'));
+        $variantsStmt = $pdo->prepare(
+            "SELECT id, product_id, variant_name, price, stock_quantity
+             FROM product_variants
+             WHERE product_id IN ({$placeholders})
+             ORDER BY id ASC"
+        );
+        $variantsStmt->execute($productIds);
+
+        foreach ($variantsStmt->fetchAll() as $variantRow) {
+            $productIdKey = (string) $variantRow['product_id'];
+            if (!isset($products[$productIdKey])) {
+                continue;
+            }
+
+            $products[$productIdKey]['variants'][] = [
+                'id' => (string) $variantRow['id'],
+                'label' => (string) ($variantRow['variant_name'] ?: 'Default'),
+                'price' => (float) ($variantRow['price'] ?? 0),
+                'stock' => (int) ($variantRow['stock_quantity'] ?? 0),
+            ];
+        }
+
+        return array_values($products);
+    }
+
+    /**
+     * Load one active product by slug including variants.
+     */
+    private static function loadProductBySlug(string $slug): ?array
+    {
+        $pdo = self::db();
+
+        $productStmt = $pdo->prepare(
+            'SELECT p.id, p.name, p.slug, p.description, c.name AS category_name
+             FROM products p
+             LEFT JOIN categories c ON c.id = p.category_id
+             WHERE p.slug = :slug AND p.status = "active"
+             LIMIT 1'
+        );
+        $productStmt->execute(['slug' => $slug]);
+        $row = $productStmt->fetch();
+
+        if (!$row) {
+            return null;
+        }
+
+        $product = [
+            'id' => (string) $row['id'],
+            'name' => (string) ($row['name'] ?? ''),
+            'slug' => (string) ($row['slug'] ?? ''),
+            'description' => (string) ($row['description'] ?? ''),
+            'category' => [
+                'name' => (string) ($row['category_name'] ?? ''),
+            ],
+            'variants' => [],
+        ];
+
+        $variantsStmt = $pdo->prepare(
+            'SELECT id, variant_name, price, stock_quantity
+             FROM product_variants
+             WHERE product_id = :product_id
+             ORDER BY id ASC'
+        );
+        $variantsStmt->execute(['product_id' => (int) $row['id']]);
+
+        foreach ($variantsStmt->fetchAll() as $variantRow) {
+            $product['variants'][] = [
+                'id' => (string) $variantRow['id'],
+                'label' => (string) ($variantRow['variant_name'] ?: 'Default'),
+                'price' => (float) ($variantRow['price'] ?? 0),
+                'stock' => (int) ($variantRow['stock_quantity'] ?? 0),
+            ];
+        }
+
+        return $product;
+    }
+
     /**
      * Ensure session is started and return the CSRF token.
      */
@@ -34,6 +178,52 @@ class ShopController
         return htmlspecialchars($value, ENT_QUOTES | ENT_HTML5, 'UTF-8');
     }
 
+    /**
+     * Build a compact single-paragraph summary for product cards.
+     */
+    private static function buildCardDescription(string $description): string
+    {
+        $description = trim($description);
+        if ($description === '') {
+            return 'Analytical reference material for laboratory and characterization use.';
+        }
+
+        $parts = preg_split('/\R+/', $description) ?: [];
+        $summaryLines = [];
+
+        foreach ($parts as $line) {
+            $line = trim($line);
+            if ($line === '') {
+                continue;
+            }
+            if (str_starts_with($line, 'Formal Name:') || str_starts_with($line, 'CAS Number:') || str_starts_with($line, 'Molecular Formula:') || str_starts_with($line, 'Formula Weight:') || str_starts_with($line, 'Purity:') || str_starts_with($line, 'Formulation:') || str_starts_with($line, 'Reference Dose/Strength:')) {
+                continue;
+            }
+            if (str_starts_with($line, 'Source Notes:')) {
+                $line = trim(substr($line, strlen('Source Notes:')));
+            }
+
+            if ($line !== '') {
+                $summaryLines[] = $line;
+            }
+
+            if (count($summaryLines) === 2) {
+                break;
+            }
+        }
+
+        $summary = trim(implode(' ', $summaryLines));
+        if ($summary === '') {
+            $summary = 'Analytical reference material for laboratory and characterization use.';
+        }
+
+        if (mb_strlen($summary) > 210) {
+            $summary = rtrim(mb_substr($summary, 0, 207)) . '...';
+        }
+
+        return $summary;
+    }
+
     public static function main(array $params = []): void
     {
         http_response_code(200);
@@ -42,13 +232,26 @@ class ShopController
         $csrfToken = self::ensureCsrf();
 
         $engine = new TemplateEngine(__DIR__ . '/../../templates');
-        $products = json_decode(file_get_contents(__DIR__ . '/../../api/products.json'), true)['products'] ?? [];
+        try {
+            $products = self::loadProductsFromDatabase();
+        } catch (PDOException $exception) {
+            $products = [];
+        }
+
         foreach ($products as &$product) {
             $product['imagegen'] = ImageManipulator::createTextImageBase64(
                 $product['name'], 
                 __DIR__ . '/../ImageManipulator/assets/card_bg.png', 
                 __DIR__ . '/../ImageManipulator/assets/Roboto-Regular.ttf'
             );
+            $product['short_description'] = self::buildCardDescription((string) ($product['description'] ?? ''));
+        }
+        unset($product);
+
+        $featuredCount = count($products);
+        $variantCount = 0;
+        foreach ($products as $product) {
+            $variantCount += count($product['variants'] ?? []);
         }
 
         echo $engine->render('home.html', [
@@ -57,9 +260,9 @@ class ShopController
             'tagline' => 'Curated compounds for a storefront.',
             'heading' => 'A storefront built around clear product cards.',
             'message' => 'Each product now lands in a styled card with artwork, concise descriptions, visible variants, and pricing that is easy to scan.',
-            'featured_count' => '04',
-            'variant_count' => '12',
-            'catalog_badge' => '4 products in the launch edit',
+            'featured_count' => str_pad((string) $featuredCount, 2, '0', STR_PAD_LEFT),
+            'variant_count' => (string) $variantCount,
+            'catalog_badge' => $featuredCount . ' products in catalog',
             'footer_text' => 'ChemHeaven store mockup powered by zRoute and ztemp.',
             'products' => $products,
             'csrf_token' => $csrfToken,
@@ -69,14 +272,11 @@ class ShopController
     public static function product(array $params = []): void
     {
         $slug = self::sanitize($params['slug'] ?? '', 128);
-        $products = json_decode(file_get_contents(__DIR__ . '/../../api/products.json'), true)['products'] ?? [];
         
-        $foundProduct = null;
-        foreach ($products as $p) {
-            if (($p['slug'] ?? '') === $slug) {
-                $foundProduct = $p;
-                break;
-            }
+        try {
+            $foundProduct = self::loadProductBySlug($slug);
+        } catch (PDOException $exception) {
+            $foundProduct = null;
         }
         
         if (!$foundProduct) {
@@ -89,8 +289,8 @@ class ShopController
         // Generate image artwork
         $foundProduct['imagegen'] = ImageManipulator::createTextImageBase64(
             $foundProduct['name'], 
-            __DIR__ . '/../../assets/card_bg.png', 
-            __DIR__ . '/../../assets/Roboto-Regular.ttf'
+            __DIR__ . '/../ImageManipulator/assets/card_bg.png', 
+            __DIR__ . '/../ImageManipulator/assets/Roboto-Regular.ttf'
         );
         
         $csrfToken = self::ensureCsrf();
@@ -314,7 +514,7 @@ class ShopController
         }
 
         $cart       = new Cart();
-        $controller = new CartController($cart, '/checkout', __DIR__ . '/../../api/products.json');
+        $controller = new CartController($cart, '/checkout', null);
 
         $controller->handle();
     }
