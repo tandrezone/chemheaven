@@ -202,7 +202,9 @@ class ShopController
         $paymentManager = new PaymentManager();
         $driver = $paymentManager->getDriver('oxo');
         
+        $orderId = 'CH-' . strtoupper(bin2hex(random_bytes(4)));
         $orderData = [
+            'order_id' => $orderId,
             'total' => $total,
             'email' => $email,
             'name' => $firstName . ' ' . $lastName
@@ -215,6 +217,16 @@ class ShopController
             session_start();
         }
         $_SESSION['active_invoice_' . $invoice['invoice_id']] = $invoice;
+        $_SESSION['order_details_' . $invoice['invoice_id']] = [
+            'order_id' => $orderId,
+            'name' => $firstName . ' ' . $lastName,
+            'address' => $address . ', ' . $city . ' ' . $zip,
+            'shipping' => $shippingMethod,
+            'shipping_cost' => $shippingCost,
+            'subtotal' => $subtotal,
+            'total' => $total,
+            'email' => $email
+        ];
         
         // Clear Cart since we have created an order / invoice successfully
         $cart->clear();
@@ -320,6 +332,102 @@ class ShopController
             'brand' => 'ChemHeaven',
             'tagline' => 'Curated compounds for a storefront.',
             'footer_text' => 'ChemHeaven store mockup powered by zRoute and ztemp.',
+            'csrf_token' => $csrfToken,
+        ]);
+    }
+
+    public static function paymentCallback(array $params = []): void
+    {
+        $rawBody = file_get_contents('php://input');
+        
+        // Helper to extract headers robustly
+        $headers = [];
+        foreach ($_SERVER as $name => $value) {
+            if (substr($name, 0, 5) == 'HTTP_') {
+                $headers[str_replace(' ', '-', ucwords(strtolower(str_replace('_', ' ', substr($name, 5)))))] = $value;
+            }
+        }
+        if (function_exists('getallheaders')) {
+            $headers = array_merge($headers, getallheaders());
+        }
+
+        $hmacHeader = $headers['HMAC'] ?? $headers['Hmac'] ?? $headers['Http-Hmac'] ?? '';
+        
+        $paymentManager = new PaymentManager();
+        $driver = $paymentManager->getDriver('oxo');
+        
+        if (!$driver->verifyWebhook($rawBody, $hmacHeader)) {
+            http_response_code(403);
+            echo "Invalid signature";
+            exit;
+        }
+        
+        $data = json_decode($rawBody, true);
+        if (!$data) {
+            http_response_code(400);
+            echo "Invalid JSON body";
+            exit;
+        }
+        
+        $invoiceId = (string)($data['trackId'] ?? $data['track_id'] ?? '');
+        $status = strtolower($data['status'] ?? '');
+        
+        if (session_status() === PHP_SESSION_NONE) {
+            session_start();
+        }
+        
+        if ($status === 'paid' || $status === 'success') {
+            $_SESSION["payment_status_{$invoiceId}"] = 'paid';
+            // Also store completed details in session for return page receipt
+            $_SESSION["completed_order_{$invoiceId}"] = [
+                'invoice_id' => $invoiceId,
+                'amount' => $data['amount'] ?? 0.0,
+                'currency' => $data['currency'] ?? 'USDT',
+                'payer_email' => $data['email'] ?? '',
+                'date' => date('Y-m-d H:i:s'),
+                'tx_id' => $data['txID'] ?? 'N/A'
+            ];
+        } elseif ($status === 'expired' || $status === 'failed') {
+            $_SESSION["payment_status_{$invoiceId}"] = 'failed';
+        }
+        
+        http_response_code(200);
+        echo "ok";
+        exit;
+    }
+
+    public static function paymentReturn(array $params = []): void
+    {
+        if (session_status() === PHP_SESSION_NONE) {
+            session_start();
+        }
+        
+        $invoiceId = self::sanitize($_GET['invoice_id'] ?? $_GET['trackId'] ?? '', 64);
+        
+        $paymentManager = new PaymentManager();
+        $driver = $paymentManager->getDriver('oxo');
+        $status = $driver->checkPaymentStatus($invoiceId);
+        
+        // If live, and the status in inquiry is paid, we can force-complete it in session
+        if ($status === 'paid' && !isset($_SESSION["completed_order_{$invoiceId}"])) {
+            $_SESSION["payment_status_{$invoiceId}"] = 'paid';
+        }
+
+        $orderDetails = $_SESSION['order_details_' . $invoiceId] ?? null;
+        $completedDetails = $_SESSION['completed_order_' . $invoiceId] ?? null;
+        
+        $csrfToken = self::ensureCsrf();
+        
+        http_response_code(200);
+        header('Content-Type: text/html; charset=UTF-8');
+        
+        $engine = new TemplateEngine(__DIR__ . '/../../templates');
+        echo $engine->render('payment-return.html', [
+            'title' => 'Order Confirmation - ChemHeaven Store',
+            'invoice_id' => htmlspecialchars($invoiceId, ENT_QUOTES, 'UTF-8'),
+            'status' => $status,
+            'order' => $orderDetails,
+            'completed' => $completedDetails,
             'csrf_token' => $csrfToken,
         ]);
     }

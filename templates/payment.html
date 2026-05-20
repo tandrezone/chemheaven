@@ -4,140 +4,127 @@
 
 <body>
     @include(partials/site-header.html)
-    
+
     <main class="page-main">
         <div class="site-shell">
             <div class="payment-card">
                 <span class="eyebrow" style="margin-bottom: 14px;">Invoice #{{ $invoice_id }}</span>
                 <h1 class="payment-title">Pay with Crypto</h1>
-                
+
                 <p class="section-copy" style="margin-bottom: 24px;">
                     Please transfer exactly the amount specified below in <strong>{{ $currency }}</strong> to complete your ChemHeaven order.
                 </p>
 
-                 <!-- Dynamic QR code via Google Charts API -->
-                 <div class="payment-qr" aria-label="Payment QR Code">
-                     <img src="https://chart.googleapis.com/chart?chs=200x200&cht=qr&chl={{ $qr_data_encoded }}&choe=UTF-8" alt="Scan QR code to pay" style="width: 100%; height: 100%; object-fit: contain;">
-                 </div>
- 
-                 <div style="margin: 20px 0;">
-                     <span style="font-size: 0.9rem; color: var(--muted); font-weight: 700;">Amount Due</span>
-                     <div style="font-size: 2.4rem; font-weight: 800; color: var(--gold); margin-top: 4px;">
-                         {{ $amount_formatted }} <span style="font-size: 1.5rem; font-weight: 600;">USDT</span>
-                     </div>
-                 </div>
- 
-                 <div class="payment-address-container">
-                     <span id="address-value" class="payment-address-value">{{ $address }}</span>
-                     <button id="copy-btn" class="payment-copy-btn" type="button">Copy</button>
-                 </div>
- 
-                 <div class="payment-status-banner">
-                     <div id="status-spinner" class="payment-status-spinner"></div>
-                     <span id="status-text">Awaiting network payment...</span>
-                 </div>
+                <!-- QR Code -->
+                <div class="payment-qr" aria-label="Payment QR Code">
+                    <img src="https://chart.googleapis.com/chart?chs=200x200&cht=qr&chl={{ $qr_data_encoded }}&choe=UTF-8" alt="Scan QR code to pay" style="width: 100%; height: 100%; object-fit: contain;">
+                </div>
 
-                 <div style="margin-top: 24px;" id="pay-btn-container">
-                     <button id="pay-now-btn" class="checkout-btn" type="button" style="width: 100%; border: none; padding: 16px; border-radius: 12px; font-weight: 700; font-size: 1.15rem; cursor: pointer; transition: all 180ms ease; background: linear-gradient(135deg, var(--gold) 0%, #a26514 100%); color: #fff; box-shadow: 0 4px 14px rgba(211, 140, 47, 0.3);">
-                         Pay Now (Mock Payment)
-                     </button>
-                 </div>
- 
-                 <!-- Hidden Success Card -->
-                 <div id="success-overlay" style="display: none; margin-top: 24px; padding: 24px; border-radius: 20px; background: rgba(45, 212, 191, 0.15); border: 1px solid rgba(45, 212, 191, 0.3); text-align: center;">
-                     <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" style="width: 48px; height: 48px; color: #0d9488; margin: 0 auto 12px;">
-                         <path fill-rule="evenodd" d="M2.25 12c0-5.385 4.365-9.75 9.75-9.75s9.75 4.365 9.75 9.75-4.365 9.75-9.75 9.75S2.25 17.385 2.25 12zm13.36-1.814a.75.75 0 10-1.22-.872l-3.236 4.53L9.53 12.22a.75.75 0 00-1.06 1.06l2.25 2.25a.75.75 0 001.14-.094l3.748-5.25z" clip-rule="evenodd" />
-                     </svg>
-                     <h3 style="margin: 0 0 8px 0; color: #0f766e; font-size: 1.3rem;">Payment Received!</h3>
-                     <p style="margin: 0; color: #115e59; font-size: 0.95rem;">Your transaction has been verified. Preparing your shipment...</p>
-                 </div>
-             </div>
-         </div>
-     </main>
- 
-     @include(partials/site-footer.html)
- 
-     <script>
-         (function() {
-             const invoiceId = "{{ $invoice_id }}";
-             const copyBtn = document.getElementById('copy-btn');
-             const addressValue = document.getElementById('address-value');
-             const statusSpinner = document.getElementById('status-spinner');
-             const statusText = document.getElementById('status-text');
-             const successOverlay = document.getElementById('success-overlay');
-             const payNowBtn = document.getElementById('pay-now-btn');
-             const payBtnContainer = document.getElementById('pay-btn-container');
- 
-             // Copy to clipboard handler
-             copyBtn.addEventListener('click', () => {
-                 navigator.clipboard.writeText(addressValue.textContent).then(() => {
-                     copyBtn.textContent = 'Copied!';
-                     copyBtn.style.background = '#0f766e';
-                     setTimeout(() => {
-                         copyBtn.textContent = 'Copy';
-                         copyBtn.style.background = 'var(--teal)';
-                     }, 2000);
-                 });
-             });
- 
-             // Polling payment status
-             let isPaid = false;
-             function checkStatus() {
-                 if (isPaid) return;
-                 fetch(`/checkout/payment?action=status&invoice_id=${invoiceId}`)
-                     .then(response => response.json())
-                     .then(data => {
-                         if (data.status === 'paid') {
-                             isPaid = true;
-                             // Payment confirmed successfully
-                             statusSpinner.style.display = 'none';
-                             statusText.textContent = 'Payment Completed!';
-                             statusText.parentElement.style.background = 'rgba(45, 212, 191, 0.2)';
-                             statusText.parentElement.style.color = '#0f766e';
-                             
-                             if (payBtnContainer) {
-                                 payBtnContainer.style.display = 'none';
-                             }
-                             
-                             // Show premium success banner
-                             successOverlay.style.display = 'block';
-                             
-                             // Redirect to home after 3 seconds
-                             setTimeout(() => {
-                                 window.location.href = '/';
-                             }, 3500);
-                         } else {
-                             // Poll again in 3 seconds
-                             setTimeout(checkStatus, 3000);
-                         }
-                     })
-                     .catch(() => {
-                         setTimeout(checkStatus, 3000);
-                     });
-             }
+                <div style="margin: 20px 0;">
+                    <span style="font-size: 0.9rem; color: var(--muted); font-weight: 700;">Amount Due</span>
+                    <div style="font-size: 2.4rem; font-weight: 800; color: var(--gold); margin-top: 4px;">
+                        {{ $amount_formatted }} <span style="font-size: 1.5rem; font-weight: 600;">USDT</span>
+                    </div>
+                </div>
 
-             if (payNowBtn) {
-                 payNowBtn.addEventListener('click', () => {
-                     payNowBtn.disabled = true;
-                     payNowBtn.textContent = 'Processing Payment...';
-                     
-                     fetch(`/checkout/payment?action=pay&invoice_id=${invoiceId}`)
-                         .then(response => response.json())
-                         .then(data => {
-                             if (data.status === 'paid') {
-                                 checkStatus();
-                             }
-                         })
-                         .catch(() => {
-                             payNowBtn.disabled = false;
-                             payNowBtn.textContent = 'Pay Now (Mock Payment)';
-                         });
-                 });
-             }
- 
-             // Start polling
-             setTimeout(checkStatus, 3000);
-         })();
-     </script>
- </body>
- </html>
+                <div class="payment-address-container">
+                    <span id="address-value" class="payment-address-value">{{ $address }}</span>
+                    <button id="copy-btn" class="payment-copy-btn" type="button">Copy</button>
+                </div>
+
+                <div class="payment-status-banner" id="status-banner">
+                    <div id="status-spinner" class="payment-status-spinner"></div>
+                    <span id="status-text">Awaiting network payment...</span>
+                </div>
+
+                <div id="pay-btn-container" style="margin-top: 24px;">
+                    <button id="pay-now-btn" class="checkout-btn" type="button">Pay Now (Mock Payment)</button>
+                </div>
+
+                <!-- Success overlay -->
+                <div id="success-overlay" class="receipt-card" style="display:none; margin-top:24px; padding:24px; border-radius:20px; background:rgba(45,212,191,0.15); border:1px solid rgba(45,212,191,0.3); text-align:center;">
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" style="width:48px;height:48px;color:#0d9488;margin:0 auto 12px;">
+                        <path fill-rule="evenodd" d="M2.25 12c0-5.385 4.365-9.75 9.75-9.75s9.75 4.365 9.75 9.75-4.365 9.75-9.75 9.75S2.25 17.385 2.25 12zm13.36-1.814a.75.75 0 10-1.22-.872l-3.236 4.53L9.53 12.22a.75.75 0 00-1.06 1.06l2.25 2.25a.75.75 0 001.14-.094l3.748-5.25z" clip-rule="evenodd"/>
+                    </svg>
+                    <h3 style="margin:0 0 8px 0;color:#0f766e;font-size:1.3rem;">Payment Received!</h3>
+                    <p style="margin:0;color:#115e59;font-size:0.95rem;">Your transaction has been verified. Preparing your shipment...</p>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    @include(partials/site-footer.html)
+
+    <script>
+        (function() {
+            const invoiceId = "{{ $invoice_id }}";
+            const copyBtn = document.getElementById('copy-btn');
+            const addressValue = document.getElementById('address-value');
+            const statusSpinner = document.getElementById('status-spinner');
+            const statusText = document.getElementById('status-text');
+            const successOverlay = document.getElementById('success-overlay');
+            const payNowBtn = document.getElementById('pay-now-btn');
+            const payBtnContainer = document.getElementById('pay-btn-container');
+
+            // Copy address to clipboard
+            copyBtn.addEventListener('click', () => {
+                navigator.clipboard.writeText(addressValue.textContent).then(() => {
+                    copyBtn.textContent = 'Copied!';
+                    copyBtn.style.background = '#0f766e';
+                    setTimeout(() => {
+                        copyBtn.textContent = 'Copy';
+                        copyBtn.style.background = 'var(--teal)';
+                    }, 2000);
+                });
+            });
+
+            // Poll payment status
+            let isPaid = false;
+            function checkStatus() {
+                if (isPaid) return;
+                fetch(`/checkout/payment?action=status&invoice_id=${invoiceId}`)
+                    .then(r => r.json())
+                    .then(data => {
+                        if (data.status === 'paid') {
+                            isPaid = true;
+                            statusSpinner.style.display = 'none';
+                            statusText.textContent = 'Payment Completed!';
+                            statusText.parentElement.style.background = 'rgba(45,212,191,0.2)';
+                            statusText.parentElement.style.color = '#0f766e';
+                            if (payBtnContainer) payBtnContainer.style.display = 'none';
+                            successOverlay.style.display = 'block';
+                            setTimeout(() => {
+                                window.location.href = `/checkout/payment-return?invoice_id=${invoiceId}`;
+                            }, 3000);
+                        } else {
+                            setTimeout(checkStatus, 3000);
+                        }
+                    })
+                    .catch(() => setTimeout(checkStatus, 3000));
+            }
+
+            // Mock payment trigger
+            if (payNowBtn) {
+                payNowBtn.addEventListener('click', () => {
+                    payNowBtn.disabled = true;
+                    payNowBtn.textContent = 'SIMULATING TRANSACTION DEPOSIT...';
+                    fetch(`/checkout/payment?action=pay&invoice_id=${invoiceId}`)
+                        .then(r => r.json())
+                        .then(data => {
+                            if (data.status === 'paid') {
+                                checkStatus();
+                            }
+                        })
+                        .catch(() => {
+                            payNowBtn.disabled = false;
+                            payNowBtn.textContent = 'TRIGGER MOCK PAYMENT';
+                        });
+                });
+            }
+
+            // Initial poll delay
+            setTimeout(checkStatus, 3000);
+        })();
+    </script>
+</body>
+</html>

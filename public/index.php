@@ -8,6 +8,12 @@ ini_set('log_errors', '1');
 
 require_once __DIR__ . '/../vendor/autoload.php';
 
+// ── Load Environment Variables ───────────────────────────────────────────
+if (file_exists(__DIR__ . '/../.env')) {
+    $dotenv = Dotenv\Dotenv::createImmutable(__DIR__ . '/../');
+    $dotenv->safeLoad();
+}
+
 use zRoute\Router;
 use Tandrezone\Chemheaven\Controllers\ShopController;
 
@@ -72,6 +78,14 @@ $router->post('/checkout', static function (array $params): void {
 
 $router->get('/checkout/payment', static function (array $params): void {
     ShopController::paymentGet($params);
+});
+
+$router->post('/checkout/payment-callback', static function (array $params): void {
+    ShopController::paymentCallback($params);
+});
+
+$router->get('/checkout/payment-return', static function (array $params): void {
+    ShopController::paymentReturn($params);
 });
 
 $router->post('/order', static function (array $params): void {
