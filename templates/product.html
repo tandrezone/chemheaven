@@ -10,8 +10,11 @@
             <!-- Back to catalog link -->
             <div class="back-nav">
                 <a href="/" class="back-link">
-                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" class="back-icon" aria-hidden="true">
-                        <path fill-rule="evenodd" d="M17 10a.75.75 0 01-.75.75H5.612l4.158 3.96a.75.75 0 11-1.04 1.08l-5.5-5.25a.75.75 0 010-1.08l5.5-5.25a.75.75 0 111.04 1.08L5.612 9.25H16.25A.75.75 0 0117 10z" clip-rule="evenodd" />
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" class="back-icon"
+                        aria-hidden="true">
+                        <path fill-rule="evenodd"
+                            d="M17 10a.75.75 0 01-.75.75H5.612l4.158 3.96a.75.75 0 11-1.04 1.08l-5.5-5.25a.75.75 0 010-1.08l5.5-5.25a.75.75 0 111.04 1.08L5.612 9.25H16.25A.75.75 0 0117 10z"
+                            clip-rule="evenodd" />
                     </svg>
                     Back to catalog
                 </a>
@@ -29,7 +32,7 @@
                 <div class="product-detail-info">
                     <span class="detail-kicker">{{ $product_category_name }}</span>
                     <h1 id="product-title" class="detail-title">{{ $product_name }}</h1>
-                    
+
                     <div class="price-row">
                         <span id="product-price-display" class="detail-price">$0.00</span>
                         <span class="stock-badge">In Stock</span>
@@ -42,9 +45,10 @@
                         <h3 class="selection-title">Select Variant</h3>
                         <div class="variant-pills">
                             @foreach($product.variants as $variant)
-                                <button class="variant-pill co-variant-btn" data-variant="{{ $variant.label }}" data-price="{{ $variant.price }}" data-id="{{ $variant.id }}" type="button">
-                                    {{ $variant.label }}
-                                </button>
+                            <button class="variant-pill co-variant-btn" data-variant="{{ $variant.label }}"
+                                data-price="{{ $variant.price }}" data-id="{{ $variant.id }}" type="button">
+                                {{ $variant.label }}
+                            </button>
                             @endforeach
                         </div>
                     </div>
@@ -52,18 +56,16 @@
                     <!-- Quantity and Add to Cart Section -->
                     <div class="action-section">
                         <div class="qty-selector">
-                            <button id="product-qty-min" class="qty-btn" type="button" aria-label="Decrease quantity">&#8722;</button>
+                            <button id="product-qty-min" class="qty-btn" type="button"
+                                aria-label="Decrease quantity">&#8722;</button>
                             <input id="product-qty-input" class="qty-input" type="number" min="1" value="1" readonly>
-                            <button id="product-qty-max" class="qty-btn" type="button" aria-label="Increase quantity">&#43;</button>
+                            <button id="product-qty-max" class="qty-btn" type="button"
+                                aria-label="Increase quantity">&#43;</button>
                         </div>
 
-                        <button id="product-add-to-cart-btn" class="co-add-btn product-cart-btn" 
-                                data-product-id="{{ $product_id }}" 
-                                data-product-name="{{ $product_name }}" 
-                                data-product-variant="" 
-                                data-price="0.00" 
-                                data-quantity="1" 
-                                type="button">
+                        <button id="product-add-to-cart-btn" class="co-add-btn product-cart-btn"
+                            data-product-id="{{ $product_id }}" data-product-name="{{ $product_name }}"
+                            data-product-variant="" data-price="0.00" data-quantity="1" type="button">
                             Add to Cart
                         </button>
                     </div>
@@ -97,7 +99,7 @@
         </div>
     </main>
 
-    @include(partials/cart-sidebar.html)
+    @include(cart-officer/cart-sidebar.html)
     @include(partials/site-footer.html)
 
     <!-- Dynamic interactions script -->
@@ -154,4 +156,5 @@
         })();
     </script>
 </body>
+
 </html>

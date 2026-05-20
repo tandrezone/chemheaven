@@ -46,8 +46,8 @@ class ShopController
         foreach ($products as &$product) {
             $product['imagegen'] = ImageManipulator::createTextImageBase64(
                 $product['name'], 
-                __DIR__ . '/../../assets/card_bg.png', 
-                __DIR__ . '/../../assets/Roboto-Regular.ttf'
+                __DIR__ . '/../ImageManipulator/assets/card_bg.png', 
+                __DIR__ . '/../ImageManipulator/assets/Roboto-Regular.ttf'
             );
         }
 

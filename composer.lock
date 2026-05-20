@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "b0ef2129edc43a86474f4c9f55c11b91",
+    "content-hash": "d2c40516773c4c14cb22095a472464a2",
     "packages": [
         {
             "name": "graham-campbell/result-type",
@@ -394,6 +394,56 @@
                 }
             ],
             "time": "2026-04-10T16:19:22+00:00"
+        },
+        {
+            "name": "tandrezone/cart-officer",
+            "version": "v1.0.3",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/tandrezone/cartOfficer.git",
+                "reference": "36637cd0c43a4d7a9cb670557dc595b6711cbb23"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/tandrezone/cartOfficer/zipball/36637cd0c43a4d7a9cb670557dc595b6711cbb23",
+                "reference": "36637cd0c43a4d7a9cb670557dc595b6711cbb23",
+                "shasum": ""
+            },
+            "require": {
+                "php": ">=7.4"
+            },
+            "type": "library",
+            "extra": {
+                "public-dir": "public",
+                "templates-dir": "templates"
+            },
+            "autoload": {
+                "psr-4": {
+                    "CartOfficer\\": "src/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "tandrezone",
+                    "role": "Developer"
+                }
+            ],
+            "description": "A lightweight, session-based PHP shopping cart package. Supports add, update, delete and order creation.",
+            "keywords": [
+                "cart",
+                "ecommerce",
+                "php",
+                "shopping-cart"
+            ],
+            "support": {
+                "issues": "https://github.com/tandrezone/cartOfficer/issues",
+                "source": "https://github.com/tandrezone/cartOfficer/tree/v1.0.3"
+            },
+            "time": "2026-05-19T15:57:59+00:00"
         },
         {
             "name": "tandrezone/zroute",

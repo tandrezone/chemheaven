@@ -5,14 +5,20 @@
     "require": {
         "vlucas/phpdotenv": "^5.6",
         "tandrezone/zroute": "^1.0",
-        "tandrezone/ztemp": "^1.0"
+        "tandrezone/ztemp": "^1.0",
+        "tandrezone/cart-officer": "^1.0"
     },
     "license": "MIT",
     "autoload": {
         "psr-4": {
             "Tandrezone\\Chemheaven\\": "src/",
-            "CartOfficer\\": "packages/CartOfficer/"
+            "Tandrezone\\Services\\": "services/"
         }
+    },
+    "scripts": {
+        "post-autoload-dump": [
+            "CartOfficer\\Scripts\\AssetHandler::publishAssets"
+        ]
     },
     "minimum-stability": "stable"
 }

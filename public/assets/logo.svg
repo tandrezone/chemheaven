@@ -1,13 +1,121 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 50" width="200" height="50">
-  <rect width="200" height="50" rx="8" fill="#161b25"/>
-  <!-- Flask icon -->
-  <g transform="translate(10,5)">
-    <polygon points="15,5 15,20 5,38 35,38 25,20 25,5" fill="none" stroke="#4f8ef7" stroke-width="2.5" stroke-linejoin="round"/>
-    <line x1="12" y1="8" x2="28" y2="8" stroke="#4f8ef7" stroke-width="2.5" stroke-linecap="round"/>
-    <circle cx="12" cy="30" r="3" fill="#4f8ef7" opacity="0.7"/>
-    <circle cx="20" cy="33" r="2" fill="#f59e0b" opacity="0.8"/>
-  </g>
-  <!-- Text -->
-  <text x="52" y="22" font-family="system-ui,-apple-system,sans-serif" font-size="14" font-weight="700" fill="#e8eaf0">Chem</text>
-  <text x="52" y="38" font-family="system-ui,-apple-system,sans-serif" font-size="14" font-weight="700" fill="#4f8ef7">Heaven</text>
+<svg width="680" height="300" viewBox="0 0 680 300" role="img" xmlns="http://www.w3.org/2000/svg">
+  <title>ChemHeaven logo</title>
+  <desc>Neo-futuristic logo for ChemHeaven research chemicals store, featuring a molecular orbital structure with hexagonal benzene ring icon</desc>
+  <defs>
+    <pattern id="dots" x="0" y="0" width="22" height="22" patternUnits="userSpaceOnUse">
+      <circle cx="11" cy="11" r="0.7" fill="#1B4060" opacity="0.7"/>
+    </pattern>
+    <pattern id="hlines" x="0" y="0" width="1" height="18" patternUnits="userSpaceOnUse">
+      <line x1="0" y1="0" x2="680" y2="0" stroke="#0D2A3E" stroke-width="0.4"/>
+    </pattern>
+  </defs>
+
+  <!-- Background -->
+  <rect width="680" height="300" fill="#040E1C"/>
+  <rect width="680" height="300" fill="url(#hlines)" opacity="0.6"/>
+  <rect width="680" height="300" fill="url(#dots)"/>
+
+  <!-- Top edge accent bar -->
+  <rect x="0" y="0" width="680" height="2" fill="#00D4C8" opacity="0.35"/>
+
+  <!-- Corner brackets -->
+  <path d="M44 50 L44 38 L56 38" fill="none" stroke="#00C4BA" stroke-width="1.2" opacity="0.6"/>
+  <path d="M624 38 L636 38 L636 50" fill="none" stroke="#00C4BA" stroke-width="1.2" opacity="0.6"/>
+  <path d="M44 250 L44 262 L56 262" fill="none" stroke="#00C4BA" stroke-width="1.2" opacity="0.6"/>
+  <path d="M624 262 L636 262 L636 250" fill="none" stroke="#00C4BA" stroke-width="1.2" opacity="0.6"/>
+
+  <!-- ORBITAL RINGS — center (158, 148) -->
+  <ellipse cx="158" cy="148" rx="92" ry="26" fill="none" stroke="#007E78" stroke-width="1" opacity="0.75"/>
+  <ellipse cx="158" cy="148" rx="92" ry="26" fill="none" stroke="#007E78" stroke-width="1" opacity="0.75" transform="rotate(60,158,148)"/>
+  <ellipse cx="158" cy="148" rx="92" ry="26" fill="none" stroke="#007E78" stroke-width="1" opacity="0.75" transform="rotate(120,158,148)"/>
+
+  <!-- Outer glow ring (thick low-opacity rings) -->
+  <ellipse cx="158" cy="148" rx="92" ry="26" fill="none" stroke="#00D4C8" stroke-width="3" opacity="0.08"/>
+  <ellipse cx="158" cy="148" rx="92" ry="26" fill="none" stroke="#00D4C8" stroke-width="3" opacity="0.08" transform="rotate(60,158,148)"/>
+  <ellipse cx="158" cy="148" rx="92" ry="26" fill="none" stroke="#00D4C8" stroke-width="3" opacity="0.08" transform="rotate(120,158,148)"/>
+
+  <!-- HEXAGON MOLECULE (r=50, center 158,148) -->
+  <!-- Bond lines from center -->
+  <line x1="158" y1="148" x2="158" y2="98"  stroke="#1E6A8A" stroke-width="1.2" opacity="0.7"/>
+  <line x1="158" y1="148" x2="201" y2="123" stroke="#1E6A8A" stroke-width="1.2" opacity="0.7"/>
+  <line x1="158" y1="148" x2="201" y2="173" stroke="#1E6A8A" stroke-width="1.2" opacity="0.7"/>
+  <line x1="158" y1="148" x2="158" y2="198" stroke="#1E6A8A" stroke-width="1.2" opacity="0.7"/>
+  <line x1="158" y1="148" x2="115" y2="173" stroke="#1E6A8A" stroke-width="1.2" opacity="0.7"/>
+  <line x1="158" y1="148" x2="115" y2="123" stroke="#1E6A8A" stroke-width="1.2" opacity="0.7"/>
+
+  <!-- Hexagon ring -->
+  <polygon points="158,98 201,123 201,173 158,198 115,173 115,123"
+           fill="none" stroke="#00D4C8" stroke-width="1.8"/>
+
+  <!-- Alternating double bond indicators -->
+  <line x1="162" y1="101" x2="197" y2="125" stroke="#00D4C8" stroke-width="0.7" opacity="0.4"/>
+  <line x1="198" y1="170" x2="162" y2="194" stroke="#00D4C8" stroke-width="0.7" opacity="0.4"/>
+  <line x1="119" y1="126" x2="119" y2="170" stroke="#00D4C8" stroke-width="0.7" opacity="0.4"/>
+
+  <!-- Vertex atoms -->
+  <circle cx="158" cy="98"  r="5.5" fill="#040E1C" stroke="#00D4C8" stroke-width="1.8"/>
+  <circle cx="201" cy="123" r="5.5" fill="#040E1C" stroke="#00D4C8" stroke-width="1.8"/>
+  <circle cx="201" cy="173" r="5.5" fill="#040E1C" stroke="#00D4C8" stroke-width="1.8"/>
+  <circle cx="158" cy="198" r="5.5" fill="#040E1C" stroke="#00D4C8" stroke-width="1.8"/>
+  <circle cx="115" cy="173" r="5.5" fill="#040E1C" stroke="#00D4C8" stroke-width="1.8"/>
+  <circle cx="115" cy="123" r="5.5" fill="#040E1C" stroke="#00D4C8" stroke-width="1.8"/>
+  <!-- Atom inner dots -->
+  <circle cx="158" cy="98"  r="2" fill="#00D4C8"/>
+  <circle cx="201" cy="123" r="2" fill="#00D4C8"/>
+  <circle cx="201" cy="173" r="2" fill="#00D4C8"/>
+  <circle cx="158" cy="198" r="2" fill="#00D4C8"/>
+  <circle cx="115" cy="173" r="2" fill="#00D4C8"/>
+  <circle cx="115" cy="123" r="2" fill="#00D4C8"/>
+
+  <!-- Center nucleus -->
+  <circle cx="158" cy="148" r="11" fill="#040E1C" stroke="#3BE0D8" stroke-width="1.8"/>
+  <circle cx="158" cy="148" r="5"  fill="#040E1C" stroke="#3BE0D8" stroke-width="1.2"/>
+  <circle cx="158" cy="148" r="2"  fill="#3BE0D8"/>
+
+  <!-- VERTICAL DIVIDER -->
+  <line x1="272" y1="72" x2="272" y2="228" stroke="#0F3A56" stroke-width="0.8"/>
+  <circle cx="272" cy="72"  r="2.5" fill="#00D4C8" opacity="0.5"/>
+  <circle cx="272" cy="228" r="2.5" fill="#00D4C8" opacity="0.5"/>
+
+  <!-- TEXT BLOCK -->
+  <text x="295" y="150"
+        font-family="'Courier New','Lucida Console',monospace"
+        font-size="64"
+        font-weight="700"
+        letter-spacing="10"
+        fill="#D8F6F5">CHEM</text>
+
+  <!-- Thin separator line -->
+  <line x1="295" y1="163" x2="588" y2="163" stroke="#00D4C8" stroke-width="0.7" opacity="0.45"/>
+
+  <text x="295" y="210"
+        font-family="'Courier New','Lucida Console',monospace"
+        font-size="64"
+        font-weight="400"
+        letter-spacing="3"
+        fill="#00C4BA">HEAVEN</text>
+
+  <!-- Tagline -->
+  <text x="296" y="235"
+        font-family="'Courier New','Lucida Console',monospace"
+        font-size="10.5"
+        font-weight="400"
+        letter-spacing="6"
+        fill="#2D7A8A">RESEARCH CHEMICALS</text>
+
+  <!-- BOTTOM SPECTRUM DECORATION -->
+  <polyline points="62,258 75,258 80,248 88,265 96,253 104,258 115,258 122,244 130,262 138,254 146,258 160,258 167,250 175,265 183,256 191,258 200,258 208,263 216,251 224,258 238,258"
+            fill="none" stroke="#007A74" stroke-width="1" opacity="0.6"/>
+
+  <!-- Data tick marks -->
+  <line x1="295" y1="248" x2="295" y2="255" stroke="#0F3A56" stroke-width="1"/>
+  <line x1="340" y1="248" x2="340" y2="255" stroke="#0F3A56" stroke-width="1"/>
+  <line x1="385" y1="248" x2="385" y2="255" stroke="#0F3A56" stroke-width="1"/>
+  <line x1="430" y1="248" x2="430" y2="255" stroke="#0F3A56" stroke-width="1"/>
+  <line x1="475" y1="248" x2="475" y2="255" stroke="#0F3A56" stroke-width="1"/>
+  <line x1="520" y1="248" x2="520" y2="255" stroke="#0F3A56" stroke-width="1"/>
+  <line x1="565" y1="248" x2="565" y2="255" stroke="#0F3A56" stroke-width="1"/>
+
+  <!-- Bottom edge accent bar -->
+  <rect x="0" y="298" width="680" height="2" fill="#00D4C8" opacity="0.2"/>
 </svg>

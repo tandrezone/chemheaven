@@ -49,9 +49,12 @@
                             <div class="product-meta">
                                 <div class="variant-buttons" id="variantGroup">
                                     @foreach($product.variants as $variant)
-                                        <button class="variant-button co-add-btn" data-product-name="{{ $product.name }}" data-product-variant="{{ $variant.label }}" data-price="{{ $variant.price }}" data-quantity="1" data-id="{{ $variant.id }}" data-product-id="{{ $product.id }}" type="button">
-                                           {{ $variant.label }}
-                                        </button>
+                                    <button class="variant-button co-add-btn" data-product-name="{{ $product.name }}"
+                                        data-product-variant="{{ $variant.label }}" data-price="{{ $variant.price }}"
+                                        data-quantity="1" data-id="{{ $variant.id }}"
+                                        data-product-id="{{ $product.id }}" type="button">
+                                        {{ $variant.label }}
+                                    </button>
                                     @endforeach
                                 </div>
                             </div>
@@ -64,7 +67,7 @@
         </div>
     </main>
 
-    @include(partials/cart-sidebar.html)
+    @include(cart-officer/cart-sidebar.html)
     @include(partials/site-footer.html)
 </body>
 
