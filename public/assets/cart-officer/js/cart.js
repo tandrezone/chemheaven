@@ -26,8 +26,8 @@
     {
       cartEndpoint: '/cart',
       orderRoute: '/orders',
-      currency: 'USD',
-      locale: 'en-US',
+      currency: 'EUR',
+      locale: 'pt-PT',
     },
     window.CartOfficer || {}
   );
