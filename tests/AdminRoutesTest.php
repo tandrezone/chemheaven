@@ -19,7 +19,7 @@ class AdminRoutesTest extends TestCase
 
     protected function setUp(): void
     {
-        // Include the route-definition file.  We use require_once so that the
+        // Include the route-definition file. We use require_once so that the
         // file-level `use` declarations and function definitions are loaded
         // exactly once even when multiple test methods run.
         require_once __DIR__ . '/../public/admin-routes.php';
