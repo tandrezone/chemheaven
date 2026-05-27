@@ -18,7 +18,11 @@
     "scripts": {
         "post-autoload-dump": [
             "CartOfficer\\Scripts\\AssetHandler::publishAssets"
-        ]
+        ],
+        "test": "phpunit"
     },
-    "minimum-stability": "stable"
+    "minimum-stability": "stable",
+    "require-dev": {
+        "phpunit/phpunit": "^10.0"
+    }
 }
