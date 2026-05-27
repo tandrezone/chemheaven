@@ -103,6 +103,10 @@ $router->get('/privacy', static function (array $params): void {
     ShopController::privacy($params);
 });
 
+require_once __DIR__ . '/admin-routes.php';
+register_admin_routes($router, '/admin');
+register_admin_routes($router, '/administration');
+
 $router->notFound(static function (string $path): void {
     http_response_code(404);
     header('Content-Type: text/html; charset=UTF-8');

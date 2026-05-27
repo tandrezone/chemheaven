@@ -79,6 +79,40 @@ try {
                 stock_quantity INT DEFAULT 0,
                 attributes JSON,
                 CONSTRAINT fk_variant_product FOREIGN KEY (product_id) REFERENCES products(id) ON DELETE CASCADE
+            ) ENGINE=InnoDB",
+
+        "admin_users" => "
+            CREATE TABLE IF NOT EXISTS admin_users (
+                id INT AUTO_INCREMENT PRIMARY KEY,
+                username VARCHAR(100) UNIQUE NOT NULL,
+                password_hash VARCHAR(255) NOT NULL,
+                created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+            ) ENGINE=InnoDB",
+
+        "payment_gateways" => "
+            CREATE TABLE IF NOT EXISTS payment_gateways (
+                id INT AUTO_INCREMENT PRIMARY KEY,
+                code VARCHAR(50) UNIQUE NOT NULL,
+                name VARCHAR(255) NOT NULL,
+                enabled TINYINT(1) NOT NULL DEFAULT 1,
+                is_default TINYINT(1) NOT NULL DEFAULT 0,
+                sort_order INT NOT NULL DEFAULT 0,
+                config JSON,
+                created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+            ) ENGINE=InnoDB",
+
+        "shipping_methods" => "
+            CREATE TABLE IF NOT EXISTS shipping_methods (
+                id INT AUTO_INCREMENT PRIMARY KEY,
+                code VARCHAR(50) UNIQUE NOT NULL,
+                name VARCHAR(255) NOT NULL,
+                description VARCHAR(500),
+                price DECIMAL(12, 2) NOT NULL DEFAULT 0.00,
+                enabled TINYINT(1) NOT NULL DEFAULT 1,
+                sort_order INT NOT NULL DEFAULT 0,
+                created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
             ) ENGINE=InnoDB"
     ];
 
@@ -93,7 +127,29 @@ try {
     $pdo->exec("CREATE INDEX IF NOT EXISTS idx_variant_sku ON product_variants(sku)");
     echo "Performance indexes applied.\n";
 
+    // 5. Seed payment gateways and shipping methods
+    $gatewayCount = (int) $pdo->query('SELECT COUNT(*) FROM payment_gateways')->fetchColumn();
+    if ($gatewayCount === 0) {
+        $pdo->exec("
+            INSERT INTO payment_gateways (code, name, enabled, is_default, sort_order, config)
+            VALUES ('oxo', 'Crypto Payment (Oxo Pay)', 1, 1, 0, '{}')
+        ");
+        echo "Default payment gateway seeded.\n";
+    }
+
+    $shippingCount = (int) $pdo->query('SELECT COUNT(*) FROM shipping_methods')->fetchColumn();
+    if ($shippingCount === 0) {
+        $pdo->exec("
+            INSERT INTO shipping_methods (code, name, description, price, enabled, sort_order) VALUES
+            ('standard', 'Standard Shipping', '3-5 business days', 10.00, 1, 0),
+            ('express', 'Express Shipping', '1-2 business days', 25.50, 1, 1),
+            ('pickup', 'In-store Pickup', 'Free', 0.00, 1, 2)
+        ");
+        echo "Default shipping methods seeded.\n";
+    }
+
     echo "\nSchema setup complete. You can now run the import script.\n";
+    echo "Create an admin user with: php commands/create-admin.php\n";
 
 } catch (\PDOException $e) {
     die("Setup failed: " . $e->getMessage());

@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="en">
+@include(administration/partials/head.html)
+<body>
+@include(administration/partials/header.html)
+<main class="page-main admin-page">
+    <div class="site-shell">
+        @include(administration/partials/flash.html)
+        <section class="hero-panel admin-hero-compact">
+            <div class="hero-copy">
+                <span class="eyebrow">Control room</span>
+                <h1 class="hero-title">{{ $page_title }}</h1>
+                <p class="hero-text">Manage catalog, checkout options, and shipping from one place.</p>
+            </div>
+            <div class="hero-stats admin-stats-grid">
+                <div class="stat-card">
+                    <span class="stat-value">{{ $stat_categories }}</span>
+                    <span class="stat-label">Categories</span>
+                </div>
+                <div class="stat-card">
+                    <span class="stat-value">{{ $stat_products }}</span>
+                    <span class="stat-label">Products</span>
+                </div>
+                <div class="stat-card stat-card--accent">
+                    <span class="stat-value">{{ $stat_gateways }}</span>
+                    <span class="stat-label">Active gateways</span>
+                </div>
+                <div class="stat-card stat-card--gold">
+                    <span class="stat-value">{{ $stat_shipping }}</span>
+                    <span class="stat-label">Shipping methods</span>
+                </div>
+            </div>
+        </section>
+        <section class="admin-panel">
+            <h2 class="section-title" style="font-size:1.25rem;margin:0 0 12px;">Quick links</h2>
+            <p class="hero-text" style="margin:0;">
+                <a href="{{ $admin_base }}/categories">Categories</a> ·
+                <a href="{{ $admin_base }}/products">Products</a> ·
+                <a href="{{ $admin_base }}/payment-gateways">Payment gateways</a> ·
+                <a href="{{ $admin_base }}/shipping">Shipping</a>
+            </p>
+        </section>
+    </div>
+</main>
+</body>
+</html>

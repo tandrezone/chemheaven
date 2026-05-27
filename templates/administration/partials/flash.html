@@ -1,0 +1,3 @@
+        @foreach($flash_messages as $flash)
+        <div class="admin-alert admin-alert--{{ $flash.type }}">{{ $flash.text }}</div>
+        @endforeach

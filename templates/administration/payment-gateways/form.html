@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="en">
+@include(administration/partials/head.html)
+<body>
+@include(administration/partials/header.html)
+<main class="page-main admin-page">
+    <div class="site-shell">
+        @include(administration/partials/flash.html)
+        <div class="section-head admin-page-header">
+            <h1 class="section-title">{{ $page_title }}</h1>
+            <a href="{{ $admin_base }}/payment-gateways" class="admin-btn admin-btn--secondary">Back</a>
+        </div>
+        <div class="checkout-billing-card admin-panel">
+            <form method="post" action="{{ $form_action }}" class="admin-form">
+                <input type="hidden" name="_csrf_token" value="{{ $csrf_token }}">
+                <div class="form-grid">
+                    <div class="form-group full-width">
+                        <label for="name" class="form-label">Display name</label>
+                        <input type="text" id="name" name="name" class="form-input" value="{{ $name }}" required>
+                    </div>
+                    <div class="form-group full-width">
+                        <label for="code" class="form-label">Driver code ({{ $allowed_drivers }})</label>
+                        <input type="text" id="code" name="code" class="form-input" value="{{ $code }}" {{ $code_readonly }} required>
+                    </div>
+                    <div class="form-group">
+                        <label for="sort_order" class="form-label">Sort order</label>
+                        <input type="number" id="sort_order" name="sort_order" class="form-input" value="{{ $sort_order }}">
+                    </div>
+                    <div class="form-group full-width">
+                        <label class="form-label"><input type="checkbox" name="enabled" {{ $enabled_checked }}> Enabled</label>
+                    </div>
+                    <div class="form-group full-width">
+                        <label class="form-label"><input type="checkbox" name="is_default" {{ $default_checked }}> Default at checkout</label>
+                    </div>
+                </div>
+                <div class="admin-btn-row">
+                    <button type="submit" class="admin-btn admin-btn--primary">Save gateway</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</main>
+</body>
+</html>

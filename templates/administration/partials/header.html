@@ -1,0 +1,19 @@
+<header class="site-header">
+    <div class="site-shell header-inner">
+        <a href="{{ $admin_base }}" class="brand-lockup">
+            <img src="/assets/logo.svg" alt="ChemHeaven" class="brand-logo-img">
+        </a>
+        <nav class="admin-nav-bar" aria-label="Administration">
+            <a href="{{ $admin_base }}" class="admin-nav-pill {{ $nav_dashboard_active }}">Dashboard</a>
+            <a href="{{ $admin_base }}/categories" class="admin-nav-pill {{ $nav_categories_active }}">Categories</a>
+            <a href="{{ $admin_base }}/products" class="admin-nav-pill {{ $nav_products_active }}">Products</a>
+            <a href="{{ $admin_base }}/payment-gateways" class="admin-nav-pill {{ $nav_gateways_active }}">Gateways</a>
+            <a href="{{ $admin_base }}/shipping" class="admin-nav-pill {{ $nav_shipping_active }}">Shipping</a>
+            <a href="/" class="admin-nav-pill admin-nav-pill--muted" target="_blank" rel="noopener">Store</a>
+            <form method="post" action="{{ $admin_base }}/logout" class="admin-logout-form">
+                <input type="hidden" name="_csrf_token" value="{{ $csrf_token }}">
+                <button type="submit" class="admin-nav-pill admin-nav-pill--danger">Sign out</button>
+            </form>
+        </nav>
+    </div>
+</header>

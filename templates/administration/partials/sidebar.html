@@ -1,0 +1,25 @@
+    <aside class="admin-sidebar">
+        <div class="admin-sidebar-header">
+            <a href="/administration" class="admin-logo-link">
+                <img src="/assets/icon.png" alt="ChemHeaven" class="admin-logo">
+            </a>
+            <span class="admin-label">Admin</span>
+        </div>
+        <ul class="admin-nav">
+            <li class="admin-nav-section">Catalog</li>
+            <li><a href="/administration" class="admin-nav-link {{ $nav_dashboard_active }}">Dashboard</a></li>
+            <li><a href="/administration/categories" class="admin-nav-link {{ $nav_categories_active }}">Categories</a></li>
+            <li><a href="/administration/products" class="admin-nav-link {{ $nav_products_active }}">Products</a></li>
+            <li class="admin-nav-section">Checkout</li>
+            <li><a href="/administration/payment-gateways" class="admin-nav-link {{ $nav_gateways_active }}">Payment gateways</a></li>
+            <li><a href="/administration/shipping" class="admin-nav-link {{ $nav_shipping_active }}">Shipping</a></li>
+        </ul>
+        <div class="admin-sidebar-footer">
+            <span class="admin-username">{{ $admin_username }}</span>
+            <a href="/" class="admin-shop-link" target="_blank" rel="noopener">View storefront</a>
+            <form method="post" action="/administration/logout" style="margin:0;">
+                <input type="hidden" name="_csrf_token" value="{{ $csrf_token }}">
+                <button type="submit" class="admin-logout-link" style="background:none;border:none;padding:0;cursor:pointer;font:inherit;">Sign out</button>
+            </form>
+        </div>
+    </aside>

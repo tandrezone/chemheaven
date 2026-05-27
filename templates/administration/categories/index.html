@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="en">
+@include(administration/partials/head.html)
+<body>
+@include(administration/partials/header.html)
+<main class="page-main admin-page">
+    <div class="site-shell">
+        @include(administration/partials/flash.html)
+        <div class="section-head admin-page-header">
+            <h1 class="section-title">{{ $page_title }}</h1>
+            <a href="{{ $admin_base }}/categories/new" class="admin-btn admin-btn--primary">Add category</a>
+        </div>
+        <div class="admin-panel table-wrap">
+            <table class="admin-table">
+                <thead>
+                    <tr>
+                        <th>Name</th>
+                        <th>Slug</th>
+                        <th>Products</th>
+                        <th></th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach($categories as $cat)
+                    <tr>
+                        <td>{{ $cat.name }}</td>
+                        <td>{{ $cat.slug }}</td>
+                        <td>{{ $cat.product_count }}</td>
+                        <td class="admin-actions">
+                            <a href="{{ $admin_base }}/categories/{{ $cat.id }}/edit">Edit</a>
+                            <form method="post" action="{{ $admin_base }}/categories/{{ $cat.id }}/delete" style="display:inline;" onsubmit="return confirm('Delete this category?');">
+                                <input type="hidden" name="_csrf_token" value="{{ $csrf_token }}">
+                                <button type="submit" class="btn-link-danger">Delete</button>
+                            </form>
+                        </td>
+                    </tr>
+                    @endforeach
+                </tbody>
+            </table>
+        </div>
+    </div>
+</main>
+</body>
+</html>

@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="en">
+@include(administration/partials/head.html)
+<body>
+@include(administration/partials/header.html)
+<main class="page-main admin-page">
+    <div class="site-shell">
+        @include(administration/partials/flash.html)
+        <div class="section-head admin-page-header">
+            <h1 class="section-title">{{ $page_title }}</h1>
+            <a href="{{ $admin_base }}/categories" class="admin-btn admin-btn--secondary">Back</a>
+        </div>
+        <div class="checkout-billing-card admin-panel">
+            <form method="post" action="{{ $form_action }}" class="admin-form">
+                <input type="hidden" name="_csrf_token" value="{{ $csrf_token }}">
+                <div class="form-grid">
+                    <div class="form-group full-width">
+                        <label for="name" class="form-label">Name</label>
+                        <input type="text" id="name" name="name" class="form-input" value="{{ $name }}" required>
+                    </div>
+                    <div class="form-group full-width">
+                        <label for="slug" class="form-label">Slug</label>
+                        <input type="text" id="slug" name="slug" class="form-input" value="{{ $slug }}" placeholder="Auto-generated if empty">
+                    </div>
+                    <div class="form-group full-width">
+                        <label for="description" class="form-label">Description</label>
+                        <textarea id="description" name="description" class="form-input" rows="4">{{ $description }}</textarea>
+                    </div>
+                </div>
+                <div class="admin-btn-row">
+                    <button type="submit" class="admin-btn admin-btn--primary">Save category</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</main>
+</body>
+</html>

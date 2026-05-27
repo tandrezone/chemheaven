@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="en">
+@include(administration/partials/head.html)
+<body>
+@include(administration/partials/header.html)
+<main class="page-main admin-page">
+    <div class="site-shell">
+        @include(administration/partials/flash.html)
+        <div class="section-head admin-page-header">
+            <h1 class="section-title">{{ $page_title }}</h1>
+            <a href="{{ $admin_base }}/products" class="admin-btn admin-btn--secondary">Back</a>
+        </div>
+        <form method="post" action="{{ $form_action }}" class="admin-form">
+            <input type="hidden" name="_csrf_token" value="{{ $csrf_token }}">
+            <div class="checkout-billing-card admin-panel">
+                <h2 class="checkout-title" style="font-size:1.2rem;margin-bottom:16px;">Product details</h2>
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label for="item_code" class="form-label">Item code</label>
+                        <input type="text" id="item_code" name="item_code" class="form-input" value="{{ $item_code }}" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="name" class="form-label">Name</label>
+                        <input type="text" id="name" name="name" class="form-input" value="{{ $name }}" required>
+                    </div>
+                    <div class="form-group full-width">
+                        <label for="slug" class="form-label">Slug</label>
+                        <input type="text" id="slug" name="slug" class="form-input" value="{{ $slug }}" placeholder="Auto-generated if empty">
+                    </div>
+                    <div class="form-group full-width">
+                        <label for="description" class="form-label">Description</label>
+                        <textarea id="description" name="description" class="form-input" rows="5">{{ $description }}</textarea>
+                    </div>
+                    <div class="form-group">
+                        <label for="category_id" class="form-label">Category</label>
+                        <select id="category_id" name="category_id" class="form-select">
+                            <option value="">— None —</option>
+                            @foreach($categories as $cat)
+                            <option value="{{ $cat.id }}" {{ $cat.selected }}>{{ $cat.name }}</option>
+                            @endforeach
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="status" class="form-label">Status</label>
+                        <select id="status" name="status" class="form-select">
+                            @foreach($status_options as $opt)
+                            <option value="{{ $opt.value }}" {{ $opt.selected }}>{{ $opt.label }}</option>
+                            @endforeach
+                        </select>
+                    </div>
+                </div>
+            </div>
+            <div class="admin-panel" style="margin-top:20px;">
+                <div class="admin-page-header">
+                    <h2 class="checkout-title" style="font-size:1.2rem;margin:0;">Variants</h2>
+                    <button type="button" class="admin-btn admin-btn--secondary" id="add-variant">Add variant</button>
+                </div>
+                <div id="variants-container">
+                    @foreach($variants as $variant)
+                    <div class="variant-row">
+                        <input type="hidden" name="variants[{{ $variant.index }}][id]" value="{{ $variant.id }}">
+                        <div class="form-grid">
+                            <div class="form-group">
+                                <label class="form-label">SKU</label>
+                                <input type="text" name="variants[{{ $variant.index }}][sku]" class="form-input" value="{{ $variant.sku }}">
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">Label</label>
+                                <input type="text" name="variants[{{ $variant.index }}][variant_name]" class="form-input" value="{{ $variant.variant_name }}">
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">Price</label>
+                                <input type="number" step="0.01" min="0" name="variants[{{ $variant.index }}][price]" class="form-input" value="{{ $variant.price }}">
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">Stock</label>
+                                <input type="number" min="0" name="variants[{{ $variant.index }}][stock_quantity]" class="form-input" value="{{ $variant.stock_quantity }}">
+                            </div>
+                        </div>
+                        <button type="button" class="btn-link-danger remove-variant">Remove variant</button>
+                    </div>
+                    @endforeach
+                </div>
+            </div>
+            <div class="admin-btn-row">
+                <button type="submit" class="admin-btn admin-btn--primary">Save product</button>
+            </div>
+        </form>
+    </div>
+</main>
+<script>
+(function () {
+    var container = document.getElementById('variants-container');
+    var addBtn = document.getElementById('add-variant');
+    var index = container ? container.querySelectorAll('.variant-row').length : 0;
+
+    function bindRemove(row) {
+        var btn = row.querySelector('.remove-variant');
+        if (btn) {
+            btn.addEventListener('click', function () { row.remove(); });
+        }
+    }
+
+    if (container) {
+        container.querySelectorAll('.variant-row').forEach(bindRemove);
+    }
+
+    if (addBtn && container) {
+        addBtn.addEventListener('click', function () {
+            var row = document.createElement('div');
+            row.className = 'variant-row';
+            row.innerHTML =
+                '<div class="form-grid">' +
+                '<div class="form-group"><label class="form-label">SKU</label><input type="text" name="variants[' + index + '][sku]" class="form-input"></div>' +
+                '<div class="form-group"><label class="form-label">Label</label><input type="text" name="variants[' + index + '][variant_name]" class="form-input"></div>' +
+                '<div class="form-group"><label class="form-label">Price</label><input type="number" step="0.01" min="0" name="variants[' + index + '][price]" class="form-input"></div>' +
+                '<div class="form-group"><label class="form-label">Stock</label><input type="number" min="0" name="variants[' + index + '][stock_quantity]" class="form-input" value="0"></div>' +
+                '</div>' +
+                '<button type="button" class="btn-link-danger remove-variant">Remove variant</button>';
+            container.appendChild(row);
+            bindRemove(row);
+            index++;
+        });
+    }
+})();
+</script>
+</body>
+</html>
