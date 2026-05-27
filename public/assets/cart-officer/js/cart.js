@@ -26,8 +26,8 @@
     {
       cartEndpoint: '/cart',
       orderRoute: '/orders',
-      currency: 'EUR',
-      locale: 'pt-PT',
+      currency: 'USD',
+      locale: 'en-US',
     },
     window.CartOfficer || {}
   );
@@ -252,9 +252,30 @@
           return;
         }
 
-        // Checkout should open the form page first (GET), not submit it.
-        var target = data.redirect || (sidebar && sidebar.dataset.orderRoute) || cfg.orderRoute || '/checkout';
-        window.location.assign(target);
+        // Build a hidden form and POST the payload to the order route
+        var form = document.createElement('form');
+        form.method = 'POST';
+        form.action = data.redirect || cfg.orderRoute;
+        form.style.display = 'none';
+
+        var payloadInput = document.createElement('input');
+        payloadInput.type = 'hidden';
+        payloadInput.name = 'cart_payload';
+        payloadInput.value = JSON.stringify(data.payload);
+        form.appendChild(payloadInput);
+
+        // CSRF token support
+        var token = csrfToken();
+        if (token) {
+          var csrf = document.createElement('input');
+          csrf.type = 'hidden';
+          csrf.name = '_csrf_token';
+          csrf.value = token;
+          form.appendChild(csrf);
+        }
+
+        document.body.appendChild(form);
+        form.submit();
       })
       .catch(function () {
         toast('Could not create order.', 'error');

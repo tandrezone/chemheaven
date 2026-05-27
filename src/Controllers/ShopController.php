@@ -10,6 +10,7 @@ use Tandrezone\OrderOrchestrator\OrderOrchestrator;
 use CartOfficer\Cart;
 use CartOfficer\CartController;
 use Tandrezone\Chemheaven\Payment\PaymentManager;
+use Tandrezone\OrderOrchestrator\OrderRepository;
 use PDO;
 use PDOException;
 
@@ -428,6 +429,33 @@ class ShopController
             'email' => $email
         ];
         
+        // ── Persist order to database ─────────────────────────────────────
+        $orderRepo = new OrderRepository();
+        $cartItems = [];
+        foreach ($cart->items() as $item) {
+            $cartItems[] = $item->toArray();
+        }
+        try {
+            $orderRepo->save(self::db(), [
+                'order_number'    => $orderId,
+                'first_name'      => $firstName,
+                'last_name'       => $lastName,
+                'email'           => $email,
+                'address'         => $address,
+                'zip'             => $zip,
+                'city'            => $city,
+                'shipping_method' => $shippingMethod,
+                'shipping_price'  => $shippingCost,
+                'payment_gateway' => 'oxo',
+                'subtotal'        => $subtotal,
+                'total'           => $total,
+                'items'           => $cartItems,
+            ]);
+        } catch (PDOException $e) {
+            // Log but do not block the user – payment flow takes priority
+            error_log('Order persistence failed: ' . $e->getMessage());
+        }
+
         // Clear Cart since we have created an order / invoice successfully
         $cart->clear();
         

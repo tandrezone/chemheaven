@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "126aa8621aecbe469f17c55d070f91a5",
+    "content-hash": "2d3271cb21d58fe940424d5541dc9c5b",
     "packages": [
         {
             "name": "graham-campbell/result-type",
@@ -444,6 +444,49 @@
                 "source": "https://github.com/tandrezone/cartOfficer/tree/v1.0.3"
             },
             "time": "2026-05-19T15:57:59+00:00"
+        },
+        {
+            "name": "tandrezone/order-orchestrator",
+            "version": "v1.0.1",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/tandrezone/OrderOrquestrator.git",
+                "reference": "21b3a71f212da3c47c4c04ac78a22d39236f9742"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/tandrezone/OrderOrquestrator/zipball/21b3a71f212da3c47c4c04ac78a22d39236f9742",
+                "reference": "21b3a71f212da3c47c4c04ac78a22d39236f9742",
+                "shasum": ""
+            },
+            "require": {
+                "php": "^8.1",
+                "tandrezone/ztemp": "^1.0"
+            },
+            "require-dev": {
+                "phpunit/phpunit": "^10.5",
+                "symfony/polyfill-mbstring": "^1.30"
+            },
+            "bin": [
+                "bin/install-order-template",
+                "bin/create-orders-table"
+            ],
+            "type": "library",
+            "autoload": {
+                "psr-4": {
+                    "Tandrezone\\OrderOrchestrator\\": "src/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "description": "Order creation package with shipping form template and total calculation.",
+            "support": {
+                "issues": "https://github.com/tandrezone/OrderOrquestrator/issues",
+                "source": "https://github.com/tandrezone/OrderOrquestrator/tree/v1.0.1"
+            },
+            "time": "2026-05-27T13:56:15+00:00"
         },
         {
             "name": "tandrezone/zroute",
