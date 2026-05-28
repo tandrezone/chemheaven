@@ -364,7 +364,7 @@ $engine = new TemplateEngine(__DIR__ . '/../../templates');
         }
         
         $subtotal = $cart->total();
-        $shipping_cost = 10.00;
+        $shipping_cost = 15.60;
         
         $csrfToken = self::ensureCsrf();
 
