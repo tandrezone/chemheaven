@@ -272,7 +272,7 @@ class ShopController
 
         public static function orderStatus(array $params = []): void
     {
-        $orderid = self::sanitize($params['id'] ?? '', 'c27c28c0-5fef-4a12-aca4-65b34ec889bc');
+        $orderid = $params['id'] ?? 'c27c28c0-5fef-4a12-aca4-65b34ec889bc';
         http_response_code(200);
         header('Content-Type: text/html; charset=UTF-8');
 $engine = new TemplateEngine(__DIR__ . '/../../templates');
