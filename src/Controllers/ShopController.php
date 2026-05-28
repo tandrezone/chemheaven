@@ -356,159 +356,27 @@ class ShopController
 
     public static function checkoutPost(array $params = []): void
     {
-        // ── CSRF validation ──────────────────────────────────────────────
-        if (!csrf_validate()) {
-            http_response_code(403);
-            header('Content-Type: text/plain; charset=UTF-8');
-            echo 'Invalid or missing security token. Please go back and try again.';
-            return;
-        }
-
-        $cart = new Cart();
-        if ($cart->isEmpty()) {
-            header('Location: /');
-            exit;
-        }
-        
-        // ── Input sanitization & validation ──────────────────────────────
-        $email = filter_input(INPUT_POST, 'email', FILTER_VALIDATE_EMAIL);
-        if (!$email) {
-            http_response_code(422);
-            echo 'Invalid email address.';
-            return;
-        }
-
-        $firstName = self::sanitize($_POST['first_name'] ?? '', 100);
-        $lastName  = self::sanitize($_POST['last_name'] ?? '', 100);
-        $address   = self::sanitize($_POST['address'] ?? '', 500);
-        $zip       = self::sanitize($_POST['zip'] ?? '', 20);
-        $city      = self::sanitize($_POST['city'] ?? '', 100);
-
-        if (empty($firstName) || empty($lastName) || empty($address) || empty($zip) || empty($city)) {
-            http_response_code(422);
-            echo 'All required fields must be filled in.';
-            return;
-        }
-
-        $shippingMethod = $_POST['shipping_method'] ?? 'standard';
-        $shippingCost = match ($shippingMethod) {
-            'express' => 25.50,
-            'pickup' => 0.00,
-            default => 10.00
-        };
-        
-        $subtotal = $cart->total();
-        $total = $subtotal + $shippingCost;
-        
-        $paymentManager = new PaymentManager();
-        $driver = $paymentManager->getDriver('oxo');
-        
-        $orderId = 'CH-' . strtoupper(bin2hex(random_bytes(4)));
-        $orderData = [
-            'order_id' => $orderId,
-            'total' => $total,
-            'email' => $email,
-            'name' => $firstName . ' ' . $lastName
-        ];
-        
-        $invoice = $driver->createInvoice($orderData);
-        
-        // Store invoice in session for payment page access
-        if (session_status() === PHP_SESSION_NONE) {
-            session_start();
-        }
-        $_SESSION['active_invoice_' . $invoice['invoice_id']] = $invoice;
-        $_SESSION['order_details_' . $invoice['invoice_id']] = [
-            'order_id' => $orderId,
-            'name' => $firstName . ' ' . $lastName,
-            'address' => $address . ', ' . $city . ' ' . $zip,
-            'shipping' => $shippingMethod,
-            'shipping_cost' => $shippingCost,
-            'subtotal' => $subtotal,
-            'total' => $total,
-            'email' => $email
-        ];
-        
-        // ── Persist order to database ─────────────────────────────────────
-        $orderRepo = new OrderRepository();
-        $cartItems = [];
-        foreach ($cart->items() as $item) {
-            $cartItems[] = $item->toArray();
-        }
-        try {
-            $orderRepo->save(self::db(), [
-                'order_number'    => $orderId,
-                'first_name'      => $firstName,
-                'last_name'       => $lastName,
-                'email'           => $email,
-                'address'         => $address,
-                'zip'             => $zip,
-                'city'            => $city,
-                'shipping_method' => $shippingMethod,
-                'shipping_price'  => $shippingCost,
-                'payment_gateway' => 'oxo',
-                'subtotal'        => $subtotal,
-                'total'           => $total,
-                'items'           => $cartItems,
-            ]);
-        } catch (PDOException $e) {
-            // Log but do not block the user – payment flow takes priority
-            error_log('Order persistence failed: ' . $e->getMessage());
-        }
-
-        // Clear Cart since we have created an order / invoice successfully
-        $cart->clear();
-        
-        // Redirect to the payment redirect URL
-        header('Location: ' . $invoice['redirect_url']);
-        exit;
+ //TODO: Implement order creation, validation, and redirect to payment page
     }
 
     public static function paymentGet(array $params = []): void
     {
-        if (session_status() === PHP_SESSION_NONE) {
-            session_start();
-        }
-        
-        $invoiceId = self::sanitize($_GET['invoice_id'] ?? '', 64);
-        $paymentManager = new PaymentManager();
-        $driver = $paymentManager->getDriver('oxo');
-        
-        if (($_GET['action'] ?? '') === 'status') {
-            $status = $driver->checkPaymentStatus($invoiceId);
-            header('Content-Type: application/json; charset=utf-8');
-            echo json_encode(['status' => $status]);
-            exit;
-        }
-        
-        if (($_GET['action'] ?? '') === 'pay') {
-            $_SESSION["payment_status_{$invoiceId}"] = 'paid';
-            header('Content-Type: application/json; charset=utf-8');
-            echo json_encode(['status' => 'paid']);
-            exit;
-        }
-        
-        $invoice = $_SESSION['active_invoice_' . $invoiceId] ?? null;
-        if (!$invoice) {
-            http_response_code(404);
-            header('Content-Type: text/html; charset=UTF-8');
-            echo '<!DOCTYPE html><html lang="en"><head><meta charset="UTF-8"><title>Not Found</title></head><body><h1>Invoice not found.</h1><p><a href="/">Back to store</a></p></body></html>';
-            return;
-        }
-        
-        $csrfToken = self::ensureCsrf();
-
         http_response_code(200);
         header('Content-Type: text/html; charset=UTF-8');
         
         $engine = new TemplateEngine(__DIR__ . '/../../templates');
-        echo $engine->render('payment.html', [
-            'title' => 'Crypto Payment - ChemHeaven Store',
-            'invoice_id' => htmlspecialchars($invoice['invoice_id'], ENT_QUOTES, 'UTF-8'),
-            'amount_formatted' => number_format($invoice['amount'], 2),
-            'address' => htmlspecialchars($invoice['address'], ENT_QUOTES, 'UTF-8'),
-            'currency' => htmlspecialchars($invoice['currency'], ENT_QUOTES, 'UTF-8'),
-            'qr_data_encoded' => urlencode($invoice['qr_data']),
+        echo $engine->render('generic.html', [
+            'title' => 'Checkout - ChemHeaven Store',
+            'items' => $items,
+            'subtotal' => $subtotal,
+            'subtotal_formatted' => number_format($subtotal, 2),
+            'shipping_formatted' => number_format($shipping_cost, 2),
+            'total_formatted' => number_format($subtotal + $shipping_cost, 2),
+            'cart_payload_raw' => htmlspecialchars(json_encode([
+                'items' => $cart->toArray(),
+                'total' => $subtotal,
+                'item_count' => $cart->count()
+            ]), ENT_QUOTES, 'UTF-8'),
             'csrf_token' => $csrfToken,
         ]);
     }
@@ -566,97 +434,11 @@ class ShopController
 
     public static function paymentCallback(array $params = []): void
     {
-        $rawBody = file_get_contents('php://input');
-        
-        // Helper to extract headers robustly
-        $headers = [];
-        foreach ($_SERVER as $name => $value) {
-            if (substr($name, 0, 5) == 'HTTP_') {
-                $headers[str_replace(' ', '-', ucwords(strtolower(str_replace('_', ' ', substr($name, 5)))))] = $value;
-            }
-        }
-        if (function_exists('getallheaders')) {
-            $headers = array_merge($headers, getallheaders());
-        }
 
-        $hmacHeader = $headers['HMAC'] ?? $headers['Hmac'] ?? $headers['Http-Hmac'] ?? '';
-        
-        $paymentManager = new PaymentManager();
-        $driver = $paymentManager->getDriver('oxo');
-        
-        if (!$driver->verifyWebhook($rawBody, $hmacHeader)) {
-            http_response_code(403);
-            echo "Invalid signature";
-            exit;
-        }
-        
-        $data = json_decode($rawBody, true);
-        if (!$data) {
-            http_response_code(400);
-            echo "Invalid JSON body";
-            exit;
-        }
-        
-        $invoiceId = (string)($data['trackId'] ?? $data['track_id'] ?? '');
-        $status = strtolower($data['status'] ?? '');
-        
-        if (session_status() === PHP_SESSION_NONE) {
-            session_start();
-        }
-        
-        if ($status === 'paid' || $status === 'success') {
-            $_SESSION["payment_status_{$invoiceId}"] = 'paid';
-            // Also store completed details in session for return page receipt
-            $_SESSION["completed_order_{$invoiceId}"] = [
-                'invoice_id' => $invoiceId,
-                'amount' => $data['amount'] ?? 0.0,
-                'currency' => $data['currency'] ?? 'USDT',
-                'payer_email' => $data['email'] ?? '',
-                'date' => date('Y-m-d H:i:s'),
-                'tx_id' => $data['txID'] ?? 'N/A'
-            ];
-        } elseif ($status === 'expired' || $status === 'failed') {
-            $_SESSION["payment_status_{$invoiceId}"] = 'failed';
-        }
-        
-        http_response_code(200);
-        echo "ok";
-        exit;
     }
 
     public static function paymentReturn(array $params = []): void
     {
-        if (session_status() === PHP_SESSION_NONE) {
-            session_start();
-        }
-        
-        $invoiceId = self::sanitize($_GET['invoice_id'] ?? $_GET['trackId'] ?? '', 64);
-        
-        $paymentManager = new PaymentManager();
-        $driver = $paymentManager->getDriver('oxo');
-        $status = $driver->checkPaymentStatus($invoiceId);
-        
-        // If live, and the status in inquiry is paid, we can force-complete it in session
-        if ($status === 'paid' && !isset($_SESSION["completed_order_{$invoiceId}"])) {
-            $_SESSION["payment_status_{$invoiceId}"] = 'paid';
-        }
-
-        $orderDetails = $_SESSION['order_details_' . $invoiceId] ?? null;
-        $completedDetails = $_SESSION['completed_order_' . $invoiceId] ?? null;
-        
-        $csrfToken = self::ensureCsrf();
-        
-        http_response_code(200);
-        header('Content-Type: text/html; charset=UTF-8');
-        
-        $engine = new TemplateEngine(__DIR__ . '/../../templates');
-        echo $engine->render('payment-return.html', [
-            'title' => 'Order Confirmation - ChemHeaven Store',
-            'invoice_id' => htmlspecialchars($invoiceId, ENT_QUOTES, 'UTF-8'),
-            'status' => $status,
-            'order' => $orderDetails,
-            'completed' => $completedDetails,
-            'csrf_token' => $csrfToken,
-        ]);
+   
     }
 }

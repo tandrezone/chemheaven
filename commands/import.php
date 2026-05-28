@@ -2,24 +2,38 @@
 
 declare(strict_types=1);
 
-// Database configuration
-$host = '127.0.0.1';
-$db = 'product_management';
-$user = 'manager';
-$pass = 'manager';
-$charset = 'utf8mb4';
+require_once __DIR__ . '/../vendor/autoload.php';
 
-$dsn = "mysql:host=$host;dbname=$db;charset=$charset";
-$options = [
-    PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
-    PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC,
-    PDO::ATTR_EMULATE_PREPARES => false,
-];
+if (file_exists(__DIR__ . '/../.env')) {
+    $dotenv = Dotenv\Dotenv::createImmutable(__DIR__ . '/../');
+    $dotenv->safeLoad();
+}
+
+$host = $_ENV['DB_HOST'] ?? '127.0.0.1';
+$port = $_ENV['DB_PORT'] ?? '3306';
+$dbName = $_ENV['DB_NAME'] ?? ($_ENV['DB_DATABASE'] ?? 'product_management');
+$user = $_ENV['DB_USER'] ?? ($_ENV['DB_USERNAME'] ?? 'manager');
+$pass = $_ENV['DB_PASS'] ?? ($_ENV['DB_PASSWORD'] ?? 'manager');
+$charset = $_ENV['DB_CHARSET'] ?? 'utf8mb4';
+
+$username = trim((string) ($_ENV['ADMIN_USERNAME'] ?? ''));
+$password = (string) ($_ENV['ADMIN_PASSWORD'] ?? '');
+
+if ($username === '' || $password === '') {
+    fwrite(STDERR, "Set ADMIN_USERNAME and ADMIN_PASSWORD in .env\n");
+    exit(1);
+}
+
+$dsn = sprintf('mysql:host=%s;port=%s;dbname=%s;charset=%s', $host, $port, $dbName, $charset);
 
 try {
-    $pdo = new PDO($dsn, $user, $pass, $options);
+    $pdo = new PDO($dsn, $user, $pass, [
+        PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
+        PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC,
+    ]);
 } catch (PDOException $e) {
-    die("Connection failed: " . $e->getMessage() . PHP_EOL);
+    fwrite(STDERR, 'Database connection failed: ' . $e->getMessage() . PHP_EOL);
+    exit(1);
 }
 
 /**

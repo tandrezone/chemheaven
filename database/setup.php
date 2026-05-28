@@ -1,11 +1,14 @@
 <?php
+require_once __DIR__ . '/../vendor/autoload.php';
 
+$dotenv = Dotenv\Dotenv::createImmutable(__DIR__ . '/../');
+$dotenv->load();
 // Database configuration
-$host    = '127.0.0.1';
-$db      = 'product_management';
-$user    = 'manager';
-$pass    = 'manager';
-$charset = 'utf8mb4';
+$host    = $_ENV['DB_HOST'] ?? '127.0.0.1';
+$db      = $_ENV['DB_NAME'] ?? 'product_management';
+$user    = $_ENV['DB_USER'] ?? 'manager';
+$pass    = $_ENV['DB_PASS'] ?? 'manager';
+$charset = $_ENV['DB_CHARSET'] ?? 'utf8mb4';
 
 // Initial connection without DB name to create the database first
 $dsn = "mysql:host=$host;charset=$charset";
