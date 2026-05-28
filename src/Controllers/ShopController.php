@@ -264,7 +264,7 @@ class ShopController
             'featured_count' => str_pad((string) $featuredCount, 2, '0', STR_PAD_LEFT),
             'variant_count' => (string) $variantCount,
             'catalog_badge' => $featuredCount . ' products in catalog',
-            'footer_text' => 'ChemHeaven store mockup powered by zRoute and ztemp.',
+            'footer_text' => 'ChemHeaven product showcase powered by zRoute and ztemp.',
             'products' => $products,
             'csrf_token' => $csrfToken,
         ]);
@@ -276,8 +276,8 @@ class ShopController
         http_response_code(200);
         header('Content-Type: text/html; charset=UTF-8');
 $engine = new TemplateEngine(__DIR__ . '/../../templates');
-        if(FILE_EXISTS(__DIR__ . '/../api/orders/' . $orderid . '.json')) {
-            $orderstatus = file_get_contents(__DIR__ . '/../api/orders/' . $orderid . '.json');
+        if(FILE_EXISTS(__DIR__ . '/../../api/orders/' . $orderid . '.json')) {
+            $orderstatus = file_get_contents(__DIR__ . '/../../api/orders/' . $orderid . '.json');
         echo $engine->render('orderstatus.html', [
             'title' => 'ChemHeaven Store',
             'brand' => 'ChemHeaven',
@@ -285,13 +285,13 @@ $engine = new TemplateEngine(__DIR__ . '/../../templates');
             'heading' => 'A storefront built around clear product cards.',
             'message' => 'Each product now lands in a styled card with artwork, concise descriptions, visible variants, and pricing that is easy to scan.',
             'orderstatus' => json_decode($orderstatus, true),
-            'footer_text' => 'ChemHeaven store mockup powered by zRoute and ztemp.',
+            'footer_text' => 'ChemHeaven product showcase powered by zRoute and ztemp.',
         ]);
         } else {
             echo $engine->render('error.html', [
                  'title' => 'ChemHeaven Store',
             'brand' => 'ChemHeaven',
-            'footer_text' => 'ChemHeaven store mockup powered by zRoute and ztemp.',
+            'footer_text' => 'ChemHeaven product showcase powered by zRoute and ztemp.',
                 'error_subtitle' => 'Order Not Found',
                 'error_description' => 'The order you are looking for does not exist.',
             ]);
@@ -463,7 +463,7 @@ $engine = new TemplateEngine(__DIR__ . '/../../templates');
             'title' => 'Privacy Policy - ChemHeaven Store',
             'brand' => 'ChemHeaven',
             'tagline' => 'Curated compounds for a storefront.',
-            'footer_text' => 'ChemHeaven store mockup powered by zRoute and ztemp.',
+            'footer_text' => 'ChemHeaven product showcase powered by zRoute and ztemp.',
             'csrf_token' => $csrfToken,
         ]);
     }
