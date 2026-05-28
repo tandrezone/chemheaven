@@ -338,7 +338,8 @@ class ShopController
         header('Content-Type: text/html; charset=UTF-8');
         
         $engine = new TemplateEngine(__DIR__ . '/../../templates');
-        echo $engine->render('checkout.html', [
+        echo $engine->render('generic.html', [
+            'debug' => 'This is a debug message for the checkout page.',
             'title' => 'Checkout - ChemHeaven Store',
             'items' => $items,
             'subtotal' => $subtotal,
@@ -366,6 +367,7 @@ class ShopController
         
         $engine = new TemplateEngine(__DIR__ . '/../../templates');
         echo $engine->render('generic.html', [
+            'debug' => 'This is a debug message for the payment page.',
             'title' => 'Checkout - ChemHeaven Store',
             'items' => $items,
             'subtotal' => $subtotal,
