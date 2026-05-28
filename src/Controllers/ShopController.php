@@ -357,8 +357,113 @@ class ShopController
 
     public static function checkoutPost(array $params = []): void
     {
- //TODO: Implement order creation, validation, and redirect to payment page
-    }
+        // ── CSRF validation ──────────────────────────────────────────────
+        if (!csrf_validate()) {
+            http_response_code(403);
+            header('Content-Type: text/plain; charset=UTF-8');
+            echo 'Invalid or missing security token. Please go back and try again.';
+            return;
+        }
+
+        $cart = new Cart();
+        if ($cart->isEmpty()) {
+            header('Location: /');
+            exit;
+        }
+        
+        // ── Input sanitization & validation ──────────────────────────────
+        $email = filter_input(INPUT_POST, 'email', FILTER_VALIDATE_EMAIL);
+        if (!$email) {
+            http_response_code(422);
+            echo 'Invalid email address.';
+            return;
+        }
+
+        $firstName = self::sanitize($_POST['first_name'] ?? '', 100);
+        $lastName  = self::sanitize($_POST['last_name'] ?? '', 100);
+        $address   = self::sanitize($_POST['address'] ?? '', 500);
+        $zip       = self::sanitize($_POST['zip'] ?? '', 20);
+        $city      = self::sanitize($_POST['city'] ?? '', 100);
+
+        if (empty($firstName) || empty($lastName) || empty($address) || empty($zip) || empty($city)) {
+            http_response_code(422);
+            echo 'All required fields must be filled in.';
+            return;
+        }
+
+        $shippingMethod = $_POST['shipping_method'] ?? 'standard';
+        $shippingCost = match ($shippingMethod) {
+            'express' => 25.50,
+            'pickup' => 0.00,
+            default => 10.00
+        };
+        
+        $subtotal = $cart->total();
+        $total = $subtotal + $shippingCost;
+        
+        $paymentManager = new PaymentManager();
+        $driver = $paymentManager->getDriver('oxo');
+        
+        $orderId = 'CH-' . strtoupper(bin2hex(random_bytes(4)));
+        $orderData = [
+            'order_id' => $orderId,
+            'total' => $total,
+            'email' => $email,
+            'name' => $firstName . ' ' . $lastName
+        ];
+        
+        $invoice = $driver->createInvoice($orderData);
+        
+        // Store invoice in session for payment page access
+        if (session_status() === PHP_SESSION_NONE) {
+            session_start();
+        }
+        $_SESSION['active_invoice_' . $invoice['invoice_id']] = $invoice;
+        $_SESSION['order_details_' . $invoice['invoice_id']] = [
+            'order_id' => $orderId,
+            'name' => $firstName . ' ' . $lastName,
+            'address' => $address . ', ' . $city . ' ' . $zip,
+            'shipping' => $shippingMethod,
+            'shipping_cost' => $shippingCost,
+            'subtotal' => $subtotal,
+            'total' => $total,
+            'email' => $email
+        ];
+        
+        // ── Persist order to database ─────────────────────────────────────
+        $orderRepo = new OrderRepository();
+        $cartItems = [];
+        foreach ($cart->items() as $item) {
+            $cartItems[] = $item->toArray();
+        }
+        try {
+            $orderRepo->save(self::db(), [
+                'order_number'    => $orderId,
+                'first_name'      => $firstName,
+                'last_name'       => $lastName,
+                'email'           => $email,
+                'address'         => $address,
+                'zip'             => $zip,
+                'city'            => $city,
+                'shipping_method' => $shippingMethod,
+                'shipping_price'  => $shippingCost,
+                'payment_gateway' => 'oxo',
+                'subtotal'        => $subtotal,
+                'total'           => $total,
+                'items'           => $cartItems,
+            ]);
+        } catch (PDOException $e) {
+            // Log but do not block the user – payment flow takes priority
+            error_log('Order persistence failed: ' . $e->getMessage());
+        }
+
+        // Clear Cart since we have created an order / invoice successfully
+        $cart->clear();
+        
+        // Redirect to the payment redirect URL
+        header('Location: ' . $invoice['redirect_url']);
+        exit;
+            }
 
     public static function paymentGet(array $params = []): void
     {
