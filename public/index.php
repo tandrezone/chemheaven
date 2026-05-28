@@ -92,6 +92,11 @@ $router->post('/order', static function (array $params): void {
     ShopController::order($params);
 });
 
+$router->get('/orderstatus', static function (array $params): void {
+    ShopController::orderStatus($params);
+});
+
+
 $router->post('/cart', static function (array $params): void {
     ShopController::addToCart($params);
 });

@@ -270,6 +270,28 @@ class ShopController
         ]);
     }
 
+        public static function orderStatus(array $params = []): void
+    {
+        $orderid = self::sanitize($params['id'] ?? '', 64);
+        $orderstatus =file_get_contents(__DIR__ . '/../../api/orders/' . $orderid . '.json');
+
+        http_response_code(200);
+        header('Content-Type: text/html; charset=UTF-8');
+
+
+        $engine = new TemplateEngine(__DIR__ . '/../../templates');
+        
+        echo $engine->render('orderstatus.html', [
+            'title' => 'ChemHeaven Store',
+            'brand' => 'ChemHeaven',
+            'tagline' => 'Curated compounds for a storefront.',
+            'heading' => 'A storefront built around clear product cards.',
+            'message' => 'Each product now lands in a styled card with artwork, concise descriptions, visible variants, and pricing that is easy to scan.',
+            'orderstatus' => json_decode($orderstatus, true),
+            'footer_text' => 'ChemHeaven store mockup powered by zRoute and ztemp.',
+        ]);
+    }
+
     public static function product(array $params = []): void
     {
         $slug = self::sanitize($params['slug'] ?? '', 128);
