@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html lang="en">
+@include(partials/head.html)
+
+<body>
+    @include(partials/site-header.html)
+    
+    <main class="page-main">
+        <div class="site-shell">
+            <div class="checkout-panel">
+                <!-- Left Column: Checkout Billing & Shipping Form -->
+                <section class="checkout-billing-card" aria-labelledby="checkout-title">
+                    <h1 id="checkout-title" class="checkout-title">ERROR</h1>
+                    <h3 style="color: red;">{{ $debug }}</h3>
+                    <h2 class="checkout-subtitle">{{$error_subtitle}}</h2>
+                    <span class="checkout-description">{{$error_description}}</span>
+                </section>
+               
+
+            </div>
+        </div>
+    </main>
+
+    @include(partials/site-footer.html)
+
+  
+</body>
+</html>
