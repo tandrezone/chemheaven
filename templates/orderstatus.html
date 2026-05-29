@@ -29,7 +29,7 @@
                 </div>
             </div>
             <!-- Interactive Live Crypto/Invoice Panel -->
-            <div class="hero-art invoice-link-card">
+            <div class="hero-art invoice-link-card" style="padding:28px">
                 <div class="invoice-content">
                     <span class="card-tag">Payment Network</span>
                     <h3>{{ $payment_method }} Gateway</h3>
@@ -52,7 +52,7 @@
                     <div class="product-grid single-item-view">
                         <!-- Iterating over the item array dynamic blocks -->
                         @foreach($items as $item)
-                        <article class="product-card static-card">
+                        <article class="product-card static-card" style="padding: 28px;">
                             <div class="product-media">
                                 <img src="{{ $item.image }}" alt="{{ $item.product.name }}">
                             </div>
