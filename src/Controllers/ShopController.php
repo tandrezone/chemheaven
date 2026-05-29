@@ -275,16 +275,24 @@ class ShopController
         $orderid = $params['id'] ?? 'c27c28c0-5fef-4a12-aca4-65b34ec889bc';
         http_response_code(200);
         header('Content-Type: text/html; charset=UTF-8');
-$engine = new TemplateEngine(__DIR__ . '/../../templates');
+        $engine = new TemplateEngine(__DIR__ . '/../../templates');
         if(FILE_EXISTS(__DIR__ . '/../../api/orders/' . $orderid . '.json')) {
             $orderstatus = file_get_contents(__DIR__ . '/../../api/orders/' . $orderid . '.json');
+            $orderinfo = json_decode($orderstatus, true);
         echo $engine->render('orderstatus.html', [
             'title' => 'ChemHeaven Store',
             'brand' => 'ChemHeaven',
             'tagline' => 'Curated compounds for a storefront.',
             'heading' => 'A storefront built around clear product cards.',
             'message' => 'Each product now lands in a styled card with artwork, concise descriptions, visible variants, and pricing that is easy to scan.',
-            'orderstatus' => json_decode($orderstatus, true),
+            'id' => $orderinfo['id'] ?? '',
+            'order_id' => $orderinfo['order_id'] ?? '',
+            'total' => $orderinfo['total'] ?? '',
+            'currency' => $orderinfo['currency'] ?? '',
+            'payment_method' => $orderinfo['payment_method'] ?? '',
+            'payment_track_id' => $orderinfo['payment_track_id'] ?? '',
+            'payment_url' => $orderinfo['payment_url'] ?? '',
+            'items' => $orderinfo['items'] ?? [],
             'footer_text' => 'ChemHeaven product showcase powered by zRoute and ztemp.',
         ]);
         } else {

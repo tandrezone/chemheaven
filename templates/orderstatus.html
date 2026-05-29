@@ -5,218 +5,166 @@
 <body>
     @include(partials/site-header.html)
 
-    <div class="max-w-2xl mx-auto px-4 sm:px-6 py-10">
-        <style>
-            @keyframes truckRoll {
-                0% {
-                    transform: translateX(0) rotate(0deg);
-                }
-
-                10% {
-                    transform: translateX(1px) rotate(0.5deg);
-                }
-
-                20% {
-                    transform: translateX(-1px) rotate(-0.5deg);
-                }
-
-                30% {
-                    transform: translateX(1.5px) rotate(0.3deg);
-                }
-
-                40% {
-                    transform: translateX(-0.5px) rotate(-0.3deg);
-                }
-
-                50% {
-                    transform: translateX(1px) rotate(0.5deg);
-                }
-
-                60% {
-                    transform: translateX(-1px) rotate(-0.2deg);
-                }
-
-                70% {
-                    transform: translateX(0.5px) rotate(0.3deg);
-                }
-
-                80% {
-                    transform: translateX(-1.5px) rotate(-0.5deg);
-                }
-
-                90% {
-                    transform: translateX(1px) rotate(0.2deg);
-                }
-
-                100% {
-                    transform: translateX(0) rotate(0deg);
-                }
-            }
-
-            @keyframes wheelSpin {
-                from {
-                    transform: rotate(0deg);
-                }
-
-                to {
-                    transform: rotate(360deg);
-                }
-            }
-
-            @keyframes progressGlow {
-
-                0%,
-                100% {
-                    box-shadow: 0 0 8px rgba(0, 230, 118, 0.4);
-                }
-
-                50% {
-                    box-shadow: 0 0 18px rgba(0, 230, 118, 0.7);
-                }
-            }
-
-            @keyframes stepPulse {
-
-                0%,
-                100% {
-                    box-shadow: 0 0 0 0 rgba(110, 178, 255, 0.4);
-                }
-
-                50% {
-                    box-shadow: 0 0 0 8px rgba(110, 178, 255, 0);
-                }
-            }
-
-            .truck-anim {
-                animation: truckRoll 0.8s ease-in-out infinite;
-            }
-
-            .progress-glow {
-                animation: progressGlow 2s ease-in-out infinite;
-            }
-
-            .step-active-pulse {
-                animation: stepPulse 2s ease-in-out infinite;
-            }
-        </style>
-        <div class="glass rounded-2xl p-6 mb-6">
-            <div class="flex items-start justify-between mb-4">
-                <div>
-                    <p class="text-xs font-mono mb-1" style="color: rgb(99, 117, 156);">ORDER</p>
-                    <h1 class="font-headline text-2xl font-bold" style="color: rgb(220, 229, 255);">ORD-MPO8C4RJ-FKU
-                    </h1>
-                </div>
-                <div class="flex flex-col items-end gap-2"><span class="badge badge-paid">paid</span><span
-                        class="badge badge-processing">Processing</span></div>
-            </div>
-            <div class="p-3 rounded-xl mb-5 text-sm flex items-center gap-2"
-                style="background: rgba(0, 230, 118, 0.08); color: rgb(0, 230, 118); border: 1px solid rgba(0, 230, 118, 0.2);">
-                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
-                    <polyline points="20 6 9 17 4 12"></polyline>
-                </svg>Payment confirmed! Your order is being prepared.</div>
-            <div>
-                <div class="relative h-1.5 rounded-full mb-6 mt-2 overflow-hidden"
-                    style="background: rgba(53, 72, 107, 0.4);">
-                    <div class="absolute left-0 top-0 h-full rounded-full transition-all duration-1000 ease-out progress-glow"
-                        style="width: 50%; background: linear-gradient(90deg, rgb(0, 230, 118), rgb(110, 178, 255));">
+<main class="page-main">
+    <div class="site-shell">
+        
+        <!-- Order Header Status Panel -->
+        <section class="hero-panel status-hero">
+            <div class="hero-copy">
+                <span class="eyebrow">Order Registry</span>
+                <h1 class="hero-title">Order Status: 
+                    <span class="status-badge status-{{ $status }}">{{ $status }}</span>
+                </h1>
+                <p class="hero-text text-mono">ID: {{ $id }}</p>
+                
+                <div class="hero-stats order-quick-specs">
+                    <div class="stat-card">
+                        <span class="stat-label">Order Number</span>
+                        <span class="stat-value text-mono">{{ $order_id }}</span>
                     </div>
-                </div>
-                <div class="flex justify-between gap-1">
-                    <div class="flex flex-col items-center flex-1 min-w-0">
-                        <div class="w-10 h-10 sm:w-12 sm:h-12 rounded-full flex items-center justify-center mb-2 transition-all duration-500 flex-shrink-0  "
-                            style="background: rgba(0, 230, 118, 0.12); border: 2px solid rgba(0, 230, 118, 0.5);"><svg
-                                width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#00e676"
-                                stroke-width="2.5">
-                                <polyline points="20 6 9 17 4 12"></polyline>
-                            </svg></div>
-                        <p class="text-center leading-tight font-medium"
-                            style="color: rgb(0, 230, 118); font-size: 0.6rem;">Order Placed</p>
+                    <div class="stat-card">
+                        <span class="stat-label">Total Amount</span>
+                        <span class="stat-value text-success">{{ $total }} {{ $currency }}</span>
                     </div>
-                    <div class="flex flex-col items-center flex-1 min-w-0">
-                        <div class="w-10 h-10 sm:w-12 sm:h-12 rounded-full flex items-center justify-center mb-2 transition-all duration-500 flex-shrink-0  "
-                            style="background: rgba(0, 230, 118, 0.12); border: 2px solid rgba(0, 230, 118, 0.5);"><svg
-                                width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#00e676"
-                                stroke-width="2.5">
-                                <polyline points="20 6 9 17 4 12"></polyline>
-                            </svg></div>
-                        <p class="text-center leading-tight font-medium"
-                            style="color: rgb(0, 230, 118); font-size: 0.6rem;">Payment Confirmed</p>
-                    </div>
-                    <div class="flex flex-col items-center flex-1 min-w-0">
-                        <div class="w-10 h-10 sm:w-12 sm:h-12 rounded-full flex items-center justify-center mb-2 transition-all duration-500 flex-shrink-0 step-active-pulse "
-                            style="background: rgba(110, 178, 255, 0.12); border: 2px solid rgba(110, 178, 255, 0.6);">
-                            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#6eb2ff"
-                                stroke-width="2">
-                                <path
-                                    d="M21 16V8a2 2 0 00-1-1.73l-7-4a2 2 0 00-2 0l-7 4A2 2 0 003 8v8a2 2 0 001 1.73l7 4a2 2 0 002 0l7-4A2 2 0 0021 16z">
-                                </path>
-                                <polyline points="3.27 6.96 12 12.01 20.73 6.96"></polyline>
-                                <line x1="12" y1="22.08" x2="12" y2="12"></line>
-                            </svg></div>
-                        <p class="text-center leading-tight font-medium"
-                            style="color: rgb(110, 178, 255); font-size: 0.6rem;">Packing</p>
-                    </div>
-                    <div class="flex flex-col items-center flex-1 min-w-0">
-                        <div class="w-10 h-10 sm:w-12 sm:h-12 rounded-full flex items-center justify-center mb-2 transition-all duration-500 flex-shrink-0  "
-                            style="background: rgba(53, 72, 107, 0.15); border: 2px solid rgba(53, 72, 107, 0.4);"><svg
-                                width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#35486b"
-                                stroke-width="2">
-                                <rect x="1" y="3" width="15" height="13"></rect>
-                                <polygon points="16 8 20 8 23 11 23 16 16 16 16 8"></polygon>
-                                <circle cx="5.5" cy="18.5" r="2.5"></circle>
-                                <circle cx="18.5" cy="18.5" r="2.5"></circle>
-                            </svg></div>
-                        <p class="text-center leading-tight font-medium"
-                            style="color: rgb(53, 72, 107); font-size: 0.6rem;">Shipped</p>
-                    </div>
-                    <div class="flex flex-col items-center flex-1 min-w-0">
-                        <div class="w-10 h-10 sm:w-12 sm:h-12 rounded-full flex items-center justify-center mb-2 transition-all duration-500 flex-shrink-0  "
-                            style="background: rgba(53, 72, 107, 0.15); border: 2px solid rgba(53, 72, 107, 0.4);"><svg
-                                width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#35486b"
-                                stroke-width="2">
-                                <path d="M22 11.08V12a10 10 0 11-5.93-9.14"></path>
-                                <polyline points="22 4 12 14.01 9 11.01"></polyline>
-                            </svg></div>
-                        <p class="text-center leading-tight font-medium"
-                            style="color: rgb(53, 72, 107); font-size: 0.6rem;">Delivered</p>
-                    </div>
-                </div>
-                <div class="mt-4 p-3 rounded-xl text-center"
-                    style="background: rgba(110, 178, 255, 0.04); border: 1px solid rgba(110, 178, 255, 0.1);">
-                    <p class="text-xs" style="color: rgb(153, 171, 212);">Items are being carefully packaged for
-                        discreet transport.</p>
                 </div>
             </div>
-        </div>
-        <div class="glass rounded-2xl p-6 mb-6">
-            <h2 class="font-semibold mb-4" style="color: rgb(220, 229, 255);">Items</h2>
-            <div class="space-y-4">
-                <div class="flex items-center gap-4">
-                    <div class="w-12 h-12 rounded-lg flex-shrink-0 overflow-hidden" style="background: rgb(0, 30, 72);">
-                        <img src="https://i.ibb.co/k2qrL3YH/11111.png" alt="4-MMC" class="w-full h-full object-cover">
-                    </div>
-                    <div class="flex-1 min-w-0">
-                        <p class="font-medium text-sm truncate" style="color: rgb(220, 229, 255);">4-MMC</p>
-                        <p class="text-xs" style="color: rgb(153, 171, 212);">5g × 1</p>
-                    </div><span class="font-mono text-sm flex-shrink-0" style="color: rgb(220, 229, 255);">€62.50</span>
+            <!-- Interactive Live Crypto/Invoice Panel -->
+            <div class="hero-art invoice-link-card">
+                <div class="invoice-content">
+                    <span class="card-tag">Payment Network</span>
+                    <h3>{{ $payment_method }} Gateway</h3>
+                    <p>Track ID: <span class="text-mono">{{ $payment_track_id }}</span></p>
+                    <a href="{{ $payment_url }}" target="_blank" class="co-cart-btn btn-invoice">
+                        View Secure Invoice
+                    </a>
                 </div>
             </div>
-            <div class="border-t mt-4 pt-4 space-y-1" style="border-color: rgba(53, 72, 107, 0.4);">
-                <div class="flex justify-between text-sm" style="color: rgb(153, 171, 212);"><span>Subtotal</span><span
-                        class="font-mono">€62.50</span></div>
-                <div class="flex justify-between text-sm" style="color: rgb(153, 171, 212);"><span>Shipping</span><span
-                        class="font-mono">€15.60</span></div>
-                <div class="flex justify-between font-bold pt-1" style="color: rgb(220, 229, 255);">
-                    <span>Total</span><span class="font-mono">€78.10</span></div>
+        </section>
+
+        <!-- Main Order Breakdown Grid -->
+        <section class="store-section">
+            <div class="order-layout-grid">
+                
+                <!-- Left Side: Order Items & Shipments -->
+                <div class="order-main-content">
+                    <h3 class="panel-sub-title">Manifest & Items</h3>
+                    
+                    <div class="product-grid single-item-view">
+                        <!-- Iterating over the item array dynamic blocks -->
+                        @foreach($items as $item)
+                        <article class="product-card static-card">
+                            <div class="product-media">
+                                <img src="{{ $item->product_image }}" alt="{{ $item->product_name }}">
+                            </div>
+                            <div class="product-info">
+                                <div class="product-meta">
+                                    <span class="product-tag">Retail</span>
+                                    <span class="product-sku text-mono">Qty: {{ $item->quantity }}</span>
+                                </div>
+                                <h2 class="product-title">{{ $item->product_name }}</h2>
+                                <p class="product-description">{{ $item->product_description }}</p>
+                                <div class="product-footer">
+                                    <div class="product-price">
+                                        <span class="price-amount">{{ $item->price }} {{ $currency }}</span>
+                                        <span class="variant-label">Selected Variant: {{ $item->variant_value }}{{ $item->variant_unit }}</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </article>
+                        @endforeach
+                    </div>
+
+                    <!-- Logistics & Routing -->
+                    <div class="logistics-panel">
+                        <h3 class="panel-sub-title">Logistics Details</h3>
+                        <div class="info-table-wrapper">
+                            <table class="data-table">
+                                <thead>
+                                    <tr>
+                                        <th>Carrier</th>
+                                        <th>Route Method</th>
+                                        <th>Est. Window</th>
+                                        <th>Tracking Code</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td class="font-bold">{{ $shipping_method_carrier }}</td>
+                                        <td>{{ $shipping_method_title }}</td>
+                                        <td>{{ $shipping_method_eta }}</td>
+                                        <td>
+                                            @if($tracking_code)
+                                                <span class="text-mono">{{ $tracking_code }}</span>
+                                            @else
+                                                <span class="status-badge tracking-awaiting">Awaiting Dispatch</span>
+                                            @endif
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Right Side: Metadata / Address / Ledger Summary -->
+                <div class="order-sidebar-content">
+                    
+                    <!-- Billing & Routing Metadata -->
+                    <div class="sidebar-block">
+                        <h4 class="sidebar-title">Routing Destination</h4>
+                        <div class="address-card">
+                            <p class="recipient-name">{{ $address_first_name }} {{ $address_last_name }}</p>
+                            <p class="address-line">{{ $address_address }}</p>
+                            <p class="address-line">{{ $address_postcode }}, {{ $address_city }}</p>
+                            <p class="address-line font-bold">Country Code: {{ $address_country_code }}</p>
+                            <hr class="panel-divider" />
+                            <p class="contact-email text-mono">{{ $email }}</p>
+                        </div>
+                    </div>
+
+                    <!-- Financial Ledger Summary -->
+                    <div class="sidebar-block">
+                        <h4 class="sidebar-title">Financial Ledger</h4>
+                        <div class="ledger-wrapper">
+                            <div class="ledger-row">
+                                <span>Subtotal</span>
+                                <span class="text-mono">{{ $subtotal }} {{ $currency }}</span>
+                            </div>
+                            <div class="ledger-row">
+                                <span>Shipping Fees</span>
+                                <span class="text-mono">{{ $shipping_fee }} {{ $currency }}</span>
+                            </div>
+                            <div class="ledger-row">
+                                <span>Discounts Applied</span>
+                                <span class="text-mono">{{ $discount }} {{ $currency }}</span>
+                            </div>
+                            <hr class="panel-divider" />
+                            <div class="ledger-row total-row">
+                                <span>Grand Total</span>
+                                <span class="text-mono text-success">{{ $total }} {{ $currency }}</span>
+                            </div>
+                            <div class="ledger-row payment-status-row">
+                                <span>Payment Status</span>
+                                <span class="status-badge status-{{ $payment_status }}">{{ $payment_status }}</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- System Logs Timeline -->
+                    <div class="sidebar-block">
+                        <h4 class="sidebar-title">System Timestamp Nodes</h4>
+                        <ul class="timestamp-timeline text-mono">
+                            <li><strong>Initialized:</strong> {{ $created_at }}</li>
+                            <li><strong>State Sync:</strong> {{ $updated_at }}</li>
+                        </ul>
+                    </div>
+
+                </div>
+
             </div>
-        </div>
-        <div class="glass rounded-2xl p-6">
-            <h2 class="font-semibold mb-3" style="color: rgb(220, 229, 255);">Shipping To</h2>
-            <p class="text-sm" style="color: rgb(153, 171, 212);"> Mr Nicolas Nicolas<br>13 bd Robert
-                d'arbrissel<br>49000 Angers , FR</p>
-        </div>
+        </section>
     </div>
-
+</main>
     @include(partials/site-footer.html)
 </body>
 
