@@ -54,19 +54,19 @@
                         @foreach($items as $item)
                         <article class="product-card static-card">
                             <div class="product-media">
-                                <img src="{{ $item.product_image }}" alt="{{ $item.product_name }}">
+                                <img src="{{ $item.image }}" alt="{{ $item.product.name }}">
                             </div>
                             <div class="product-info">
                                 <div class="product-meta">
                                     <span class="product-tag">Retail</span>
                                     <span class="product-sku text-mono">Qty: {{ $item.quantity }}</span>
                                 </div>
-                                <h2 class="product-title">{{ $item.product_name }}</h2>
-                                <p class="product-description">{{ $item.product_description }}</p>
+                                <h2 class="product-title">{{ $item.product.name }}</h2>
+                                <p class="product-description">{{ $item.product.description }}</p>
                                 <div class="product-footer">
                                     <div class="product-price">
                                         <span class="price-amount">{{ $item.price }} {{ $currency }}</span>
-                                        <span class="variant-label">Selected Variant: {{ $item.variant_value }}{{ $item.variant_unit }}</span>
+                                        <span class="variant-label">Selected Variant: {{ $item.variant.value }}{{ $item.variant.unit }}</span>
                                     </div>
                                 </div>
                             </div>
@@ -93,8 +93,8 @@
                                         <td>{{ $shipping_method_title }}</td>
                                         <td>{{ $shipping_method_eta }}</td>
                                         <td>
-                                            @if($tracking_code)
-                                                <span class="text-mono">{{ $tracking_code }}</span>
+                                            @if($trackingNumber)
+                                                <span class="text-mono">{{ $trackingNumber }}</span>
                                             @else
                                                 <span class="status-badge tracking-awaiting">Awaiting Dispatch</span>
                                             @endif
