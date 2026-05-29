@@ -54,19 +54,19 @@
                         @foreach($items as $item)
                         <article class="product-card static-card">
                             <div class="product-media">
-                                <img src="{{ $item->product_image }}" alt="{{ $item->product_name }}">
+                                <img src="{{ $item.product_image }}" alt="{{ $item.product_name }}">
                             </div>
                             <div class="product-info">
                                 <div class="product-meta">
                                     <span class="product-tag">Retail</span>
-                                    <span class="product-sku text-mono">Qty: {{ $item->quantity }}</span>
+                                    <span class="product-sku text-mono">Qty: {{ $item.quantity }}</span>
                                 </div>
-                                <h2 class="product-title">{{ $item->product_name }}</h2>
-                                <p class="product-description">{{ $item->product_description }}</p>
+                                <h2 class="product-title">{{ $item.product_name }}</h2>
+                                <p class="product-description">{{ $item.product_description }}</p>
                                 <div class="product-footer">
                                     <div class="product-price">
-                                        <span class="price-amount">{{ $item->price }} {{ $currency }}</span>
-                                        <span class="variant-label">Selected Variant: {{ $item->variant_value }}{{ $item->variant_unit }}</span>
+                                        <span class="price-amount">{{ $item.price }} {{ $currency }}</span>
+                                        <span class="variant-label">Selected Variant: {{ $item.variant_value }}{{ $item.variant_unit }}</span>
                                     </div>
                                 </div>
                             </div>
