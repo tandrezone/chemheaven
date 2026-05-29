@@ -279,6 +279,13 @@ class ShopController
         if(FILE_EXISTS(__DIR__ . '/../../api/orders/' . $orderid . '.json')) {
             $orderstatus = file_get_contents(__DIR__ . '/../../api/orders/' . $orderid . '.json');
             $orderinfo = json_decode($orderstatus, true);
+            foreach($orderinfo['items'] as &$item) {
+                $item['image'] = ImageManipulator::createTextImageBase64(
+                    $item['name'], 
+                    __DIR__ . '/../ImageManipulator/assets/card_bg.png', 
+                    __DIR__ . '/../ImageManipulator/assets/Roboto-Regular.ttf'
+                );
+            }
         echo $engine->render('orderstatus.html', [
             'title' => 'ChemHeaven Store',
             'brand' => 'ChemHeaven',
