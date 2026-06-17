@@ -13,7 +13,8 @@
     "autoload": {
         "psr-4": {
             "Tandrezone\\Chemheaven\\": "src/",
-            "Tandrezone\\Services\\": "services/"
+            "Tandrezone\\Chemheaven\\Commands\\": "commands/",
+            "Tandrezone\\Chemheaven\\Services\\": "src/services/"
         }
     },
     "scripts": {

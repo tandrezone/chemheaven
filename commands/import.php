@@ -61,7 +61,7 @@ function slugify(string $value): string
  */
 function buildItemCode(array $item): string
 {
-    $code = (string) ($item['item_code'] ?? $item['id'] ?? $item['slug'] ?? '');
+    $code = (string) ($item['item_code'] ?? $item['slug'] ?? $item['id'] ?? '');
     if ($code === '') {
         $code = slugify((string) ($item['name'] ?? 'product'));
     }
@@ -247,7 +247,7 @@ function buildStyledDescription(array $item): string
     $profile = referenceProfile($name, $slug);
     $compoundClass = (string) ($profile['class'] ?? strtolower($categoryName));
     $formalName = (string) ($profile['formal_name'] ?? $name);
-    $cas = (string) ($profile['cas'] ?? 'Not specified in source listing');
+    $cas = (string) ($item['casNumber'] ?? $profile['cas'] ?? 'Not specified in source listing');
     $molecularFormula = (string) ($profile['molecular_formula'] ?? 'Not specified in source listing');
     $formulaWeight = (string) ($profile['formula_weight'] ?? 'Not specified in source listing');
 
@@ -303,7 +303,7 @@ function buildStyledDescription(array $item): string
 }
 
 // Load JSON data
-$jsonPath = __DIR__ . '/../api/products.json';
+$jsonPath = __DIR__ . '/../api/products_live.json';
 $jsonData = file_get_contents($jsonPath);
 if ($jsonData === false) {
     die("Error: Could not read JSON file at $jsonPath" . PHP_EOL);
