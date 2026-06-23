@@ -517,5 +517,5 @@ TEMPLATE ENGINE:
 - For form pages: use the admin-page-header + checkout-billing-card admin-panel + admin-form pattern
 - Every POST form must include: <input type="hidden" name="_csrf_token" value="{{ $csrf_token }}">
 - Delete forms need onsubmit="return confirm('...')" and style="display:inline;"
-- No closing </html> footer, no cart sidebar
+- No site footer element, no cart sidebar
 ```
