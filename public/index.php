@@ -1,9 +1,9 @@
 <?php
 declare(strict_types=1);
 
-// ── Security: suppress error display to visitors ──────────────────────────
+// ── Development: display all errors in HTTP responses ─────────────────────
 error_reporting(E_ALL);
-ini_set('display_errors', '0');
+ini_set('display_errors', '1');
 ini_set('log_errors', '1');
 
 require_once __DIR__ . '/../vendor/autoload.php';
